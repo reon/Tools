@@ -18,10 +18,28 @@
                 </RibbonApplicationMenu>
             </Ribbon.ApplicationMenu>
             <RibbonTab Header="Start">
+                <RibbonGroup Header="Database">
+                    <RibbonButton Name="ConnectButton" LargeImageSource="Images/connect_no.png" Label="Connect" Click="ConnectButton_Click"></RibbonButton>
+                    <RibbonButton Name="DisconnectButton" Label="Disconnect" Click="DisconnectButton_Click"></RibbonButton>
+                </RibbonGroup>
+                <RibbonGroup Header="Object Editor">
+                    <RibbonButton Name="ObjectAddButton" LargeImageSource="Images/db_add.png" Label="Add"></RibbonButton>
+                    <RibbonButton Name="ObjectRemoveButton" LargeImageSource="Images/db_remove.png" Label="Remove"></RibbonButton>
+                    <RibbonButton Name="ObjectEditButton" LargeImageSource="Images/database.png" Label="Edit"></RibbonButton>
+                    <RibbonButton Name="ObjectSaveButton" Label="Save"></RibbonButton>
+                    <RibbonButton Name="ObjectUndoButton" Label="Undo"></RibbonButton>
+                    <RibbonButton Name="ObjectRedoButton" Label="Redo"></RibbonButton>
+                </RibbonGroup>
             </RibbonTab>
         </Ribbon>
-        <DataGrid>
-            
-        </DataGrid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="26*"/>
+                <ColumnDefinition Width="101*"/>
+            </Grid.ColumnDefinitions>
+            <DataGrid Grid.Column="1"/>
+            <ListBox Name="ObjectList"/>
+        </Grid>
+
     </DockPanel>
 </Window>
