@@ -1,0 +1,27 @@
+﻿<Window x:Class="Arctium_Database_Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Arctium Database Editor" Height="431.25" Width="769.792">
+    <DockPanel LastChildFill="True">
+        <Ribbon DockPanel.Dock="Top" Background="#FFECECEC" BorderBrush="#FF9B9B9B" CheckedBorderBrush="#FFD4A416" Foreground="Black">
+            <Ribbon.CheckedBackground>
+                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="#FFFFDCA0" Offset="0"/>
+                    <GradientStop Color="#FFFFD692" Offset="0.18"/>
+                    <GradientStop Color="#FFFFC45D" Offset="0.39"/>
+                    <GradientStop Color="#FFFDC456" Offset="1"/>
+                </LinearGradientBrush>
+            </Ribbon.CheckedBackground>
+            <Ribbon.ApplicationMenu>
+                <RibbonApplicationMenu>
+                    <RibbonApplicationMenuItem Name="MainExitButton"  Header="Exit" Click="MainExitButton_Click" />
+                </RibbonApplicationMenu>
+            </Ribbon.ApplicationMenu>
+            <RibbonTab Header="Start">
+            </RibbonTab>
+        </Ribbon>
+        <DataGrid>
+            
+        </DataGrid>
+    </DockPanel>
+</Window>
