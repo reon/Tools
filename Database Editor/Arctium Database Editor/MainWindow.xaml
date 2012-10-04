@@ -38,6 +38,7 @@
                 <ColumnDefinition Width="101*"/>
             </Grid.ColumnDefinitions>
             <DataGrid Grid.Column="1"/>
+            <GridSplitter Grid.Column="1" Width="1" Background="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Left" />
             <ListBox Name="ObjectList"/>
         </Grid>
 
