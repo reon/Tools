@@ -37,9 +37,9 @@
                 <ColumnDefinition Width="26*"/>
                 <ColumnDefinition Width="101*"/>
             </Grid.ColumnDefinitions>
-            <DataGrid Grid.Column="1"/>
+            <DataGrid Grid.Column="1" Name="ObjectFieldTable" MinColumnWidth="70"/>
             <GridSplitter Grid.Column="1" Width="1" Background="Gray" VerticalAlignment="Stretch" HorizontalAlignment="Left" />
-            <ListBox Name="ObjectList"/>
+            <ListBox Name="ObjectList" MouseDoubleClick="ObjectList_MouseDoubleClick"/>
         </Grid>
 
     </DockPanel>
