@@ -15,8 +15,7 @@ namespace ArctiumConnectionPatcher
 
             Console.WriteLine("Choose a patch for your WoW binary: \n\n");
             Console.WriteLine("0: Exit.\n");
-            Console.WriteLine("1: Allow usage of email addresses as username (Login to official servers not possible with this patch).\n");
-            Console.WriteLine("2: Allow packet communication between server and client.\n\n");
+            Console.WriteLine("1: Allow packet communication between server and client login to private server. Email as account name is required for this!!!");
 
             var option = Convert.ToByte(Console.ReadLine());
             Console.WriteLine(option);
@@ -33,19 +32,12 @@ namespace ArctiumConnectionPatcher
                     byte[] patchedBytes = { 0xEB };
                     PatchBinary(Offsets.emailOffset, patchedBytes, wowBinary);
 
-                    Console.WriteLine("Exit in 5 seconds...");
-                    Thread.Sleep(5000);
-                    Environment.Exit(0);
-                    break;
-                }
-                case 2:
-                {
                     Console.WriteLine("Patching send function...");
 
                     byte[] SendBytes = new byte[2];
-                    PatchBinary(Offsets.Send2Offset, SendBytes, wowBinary);
-                    PatchBinary(Offsets.Send2Offset2, SendBytes, wowBinary);
-                    PatchBinary(Offsets.Send2Offset3, SendBytes, wowBinary);
+                    PatchBinary(Offsets.SendOffset, SendBytes, wowBinary);
+                    PatchBinary(Offsets.SendOffset2, SendBytes, wowBinary);
+                    PatchBinary(Offsets.SendOffset3, SendBytes, wowBinary);
 
                     Console.WriteLine("Patching legacy routing table...");
                     byte[] LegacyRoutingTableBytes = new byte[512];
