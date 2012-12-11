@@ -65,7 +65,7 @@ namespace ArctiumConnectionPatcher
             // Program start
             string wowBinary = args[0];
 
-            Console.WriteLine("World of Warcraft - Myst of Pandaria v5.1.0(16309) Client Patcher\n");
+            Console.WriteLine("Arctium World of Warcraft - Mist of Pandaria v5.1.0a(16357) Client Patcher\n");
             Console.WriteLine("This patch will allow packet communication between server and client login to private server");
             Console.WriteLine("REMEMBER: Email as account name will be required to login!!!\n");
             Console.WriteLine("Choose an action for your WoW client binary");

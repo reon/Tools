@@ -3,15 +3,15 @@
     enum Offsetsx32 : int
     {
         // Client movement packets
-        SendOffset               = 0x40B9F9,
-        SendOffset2              = 0x40BA09,
-        SendOffset3              = 0x40BA16,
+        SendOffset               = 0x40BA59,
+        SendOffset2              = 0x40BA69,
+        SendOffset3              = 0x40BA76,
         // Client packets
-        LegacyRoutingTableOffset = 0xA481F0,
+        LegacyRoutingTableOffset = 0xA48298,
         // Some server packets
-        CommsHandlerOffset       = 0x40B3CF,
+        CommsHandlerOffset       = 0x40B42F,
         // Allow login with email addresses
-        emailOffset              = 0x7C40D6
+        emailOffset              = 0x7C3F96
     }
     enum Offsetsx64 : int
     {
