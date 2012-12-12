@@ -11,20 +11,20 @@
         // Some server packets
         CommsHandlerOffset       = 0x40B42F,
         // Allow login with email addresses
-        emailOffset              = 0x7C3F96
+        emailOffset              = 0x7C3F96 
     }
     enum Offsetsx64 : int
     {
         // Client movement packets
-        SendOffset               = 0x4D0AF6,
-        SendOffset2              = 0x4D0B04,
-        SendOffset3              = 0x4D0B11,
+        SendOffset               = 0x4D0B06,
+        SendOffset2              = 0x4D0B14,
+        SendOffset3              = 0x4D0B21,
         // Client packets
-        LegacyRoutingTableOffset = 0xC54110,
+        LegacyRoutingTableOffset = 0xC543B0,
         // Some server packets
-        CommsHandlerOffset       = 0x4D0226,
+        CommsHandlerOffset       = 0x4D0236,
         // Allow login with email addresses
-        emailOffset              = 0x95C42D
+        emailOffset              = 0x95C45D 
     }
 
 }
