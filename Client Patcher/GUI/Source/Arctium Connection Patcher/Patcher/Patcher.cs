@@ -82,5 +82,12 @@ namespace Arctium_Connection_Patcher.Patcher
                 }
             }
         }
+
+        public static void Dispose()
+        {
+            Initialized = false;
+            Is64Bit = false;
+            WoWBinary = "";
+        }
     }
 }

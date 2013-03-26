@@ -72,7 +72,10 @@ namespace Arctium_Connection_Patcher
             Patcher.Patcher.Is64Bit = false;
 
             if (Patcher.Patcher.Initialized)
+            {
+                NoteText.Content = "Click on Arctium logo to start the patching process :)";
                 NoteText.Visibility = Visibility.Visible;
+            }
         }
 
         private void Image_MouseLeftButtonUp_4(object sender, MouseButtonEventArgs e)
@@ -81,7 +84,10 @@ namespace Arctium_Connection_Patcher
             Patcher.Patcher.Is64Bit = true;
 
             if (Patcher.Patcher.Initialized)
+            {
+                NoteText.Content = "Click on Arctium logo to start the patching process :)";
                 NoteText.Visibility = Visibility.Visible;
+            }
         }
 
         private void Image_MouseLeftButtonUp_5(object sender, MouseButtonEventArgs e)
@@ -110,6 +116,8 @@ namespace Arctium_Connection_Patcher
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.Email, Patcher.Bytes.Email, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.User, Patcher.Bytes.User, ref StateBox);
                 }
+
+                Patcher.Patcher.Dispose();
             }
 
             NoteText.Content = "Patching done!";
