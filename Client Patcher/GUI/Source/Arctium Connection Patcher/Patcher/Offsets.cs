@@ -21,24 +21,24 @@ namespace Arctium_Connection_Patcher.Patcher
     {
         public enum x86
         {
-            Movement     = 0x447F75,
-            Movement2    = 0x447F82,
-            Movement3    = 0x447F92,
-            Movement4    = 0x447F9F,
-            Legacy       = 0x447F70,
-            Email        = 0x800766,
-            User         = 0x2E56D5
+            Movement     = 0x4482E5,
+            Movement2    = 0x4482F2,
+            Movement3    = 0x448302,
+            Movement4    = 0x44830F,
+            Legacy       = 0x4482E0,
+            Email        = 0x800FE6,
+            User         = 0x2E53F5
         }
 
         public enum x64
         {
-            Movement     = 0x524D5A,
-            Movement2    = 0x524D67,
-            Movement3    = 0x524D76,
-            Movement4    = 0x524D84,
-            Legacy       = 0x524D56,
-            Email        = 0x9B2E2D,
-            User         = 0x37A2C0 
+            Movement     = 0x52579A,
+            Movement2    = 0x5257A7,
+            Movement3    = 0x5257B6,
+            Movement4    = 0x5257C4,
+            Legacy       = 0x525796,
+            Email        = 0x9B396D,
+            User         = 0x379DA0
         }
     }
 }
