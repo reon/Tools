@@ -35,7 +35,7 @@ namespace Arctium_Injector
             if (loadLibPtr == IntPtr.Zero)
                 throw new InvalidOperationException("Can't get ptr for LoadLibraryA.");
 
-            IntPtr lpAddress = VirtualAllocEx(p.Handle, (IntPtr)null,(uint) dll.Length, 0x1000, 0x40);
+            IntPtr lpAddress = VirtualAllocEx(p.Handle, (IntPtr)null, (uint)dll.Length + 1, 0x1000, 0x40);
             
             if (lpAddress == IntPtr.Zero)
                 throw new InvalidOperationException("VirtualAllocEx failed.");
