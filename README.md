@@ -3,9 +3,8 @@ ArctiumTools
 
 Arctium development tools.
 
-How to use the sniffer:
-1. Put the ddl and exe in your wow directory.
-2. Start the Arctium Injector as admin. (you can use it with the drag n drop method if the file name isn't Wow.exe)
-   -- Just drag the wow binary ofer Arctium Injector...
-3. type start in the console window (lowercase)... ONLY ONCE!!!
-4. A PacketDump.xxx file will be created (There won't be any activity in the console window)
+How to use the sniffer:<br />
+1. Put the dll and exe in your wow directory<br />
+2. Start the Arctium Injector as admin. (you can use it with the drag n drop method if the file name isn't Wow.exe)<br />    -- Just drag the wow binary over Arctium Injector<br />
+3. Type start in the console window (lowercase)... ONLY ONCE!!!<br />
+4. A PacketDump.xxx file will be created (There won't be any activity in the console window)<br />
