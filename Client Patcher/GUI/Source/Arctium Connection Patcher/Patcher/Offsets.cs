@@ -22,13 +22,13 @@ namespace Arctium_Connection_Patcher.Patcher
         // 5.3.0.16965
         public enum x86
         {
-            Movement     = 0x362C0C,
-            Movement2    = 0x362C19,
-            Movement3    = 0x362C29,
-            Movement4    = 0x362C36,
-            Legacy       = 0x362C07,
-            Email        = 0x6170D3,
-            User         = 0x23F156
+            Movement     = 0x362C49,
+            Movement2    = 0x362C56,
+            Movement3    = 0x362C66,
+            Movement4    = 0x362C73,
+            Legacy       = 0x362C44,
+            Email        = 0x6170C0,
+            User         = 0x23F169
         }
 
         // 5.2.0.16826
