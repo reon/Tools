@@ -19,7 +19,6 @@ namespace Arctium_Connection_Patcher.Patcher
 {
     public class Offset
     {
-        // 5.3.0.16965
         public enum x86
         {
             Movement     = 0x362C49,
@@ -31,16 +30,15 @@ namespace Arctium_Connection_Patcher.Patcher
             User         = 0x23F169
         }
 
-        // 5.2.0.16826
         public enum x64
         {
-            Movement     = 0x52579A,
-            Movement2    = 0x5257A7,
-            Movement3    = 0x5257B6,
-            Movement4    = 0x5257C4,
-            Legacy       = 0x525796,
-            Email        = 0x9B396D,
-            User         = 0x379DA0
+            Movement     = 0x55F595,
+            Movement2    = 0x55F5A2,
+            Movement3    = 0x55F5B1,
+            Movement4    = 0x55F5BF,
+            Legacy       = 0x55F58E,
+            Email        = 0xA0688D,
+            User         = 0x3992F0
         }
     }
 }
