@@ -7,3 +7,6 @@ Client Loader:<br />
    - Use it without parameters...<br />
    - Or "Arctium Client Loader.exe" maxBuild<br />
    - Or "Arctium Client Loader.exe" minBuild maxBuild<br />
+   
+Unlocker (Unlocks the disabled/unannounced Races/Classes):<br />
+1. Drag 'n Drop your Client.exe over 'Arctium WildStar Unlocker.exe'.<br />
