@@ -107,7 +107,7 @@ namespace Arctium_Connection_Patcher
                 else
                 {
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement, Patcher.Bytes.Movement, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement2, Patcher.Bytes.Movement, ref StateBox);
+                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement2, Patcher.Bytes.Movement2, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement3, Patcher.Bytes.Movement, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement4, Patcher.Bytes.Movement, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.Legacy, Patcher.Bytes.Legacy, ref StateBox);

@@ -20,6 +20,7 @@ namespace Arctium_Connection_Patcher.Patcher
     public class Bytes
     {
         public static byte[] Movement     = { 0x00, 0x00 };
+        public static byte[] Movement2    = { 0x33, 0xD2 };
         public static byte[] Legacy       = { 0x00 };
         public static byte[] Email        = { 0xEB };
         public static byte[] User         = { 0x00 };
