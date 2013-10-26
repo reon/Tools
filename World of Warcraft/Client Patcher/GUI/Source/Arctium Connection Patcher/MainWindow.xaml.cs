@@ -99,7 +99,6 @@ namespace Arctium_Connection_Patcher
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.Movement, Patcher.Bytes.Movement, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.Movement2, Patcher.Bytes.Movement, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.Movement3, Patcher.Bytes.Movement, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x64.Movement4, Patcher.Bytes.Movement, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.Legacy, Patcher.Bytes.Legacy, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.Email, Patcher.Bytes.Email, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.User, Patcher.Bytes.User, ref StateBox);
