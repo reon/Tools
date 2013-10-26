@@ -102,6 +102,7 @@ namespace Arctium_Connection_Patcher
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.Legacy, Patcher.Bytes.Legacy, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.Email, Patcher.Bytes.Email, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.User, Patcher.Bytes.User, ref StateBox);
+                    Patcher.Patcher.Patch((int)Patcher.Offset.x64.RaF, Patcher.Bytes.RaF, ref StateBox);
                 }
                 else
                 {

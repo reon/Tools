@@ -28,7 +28,7 @@ namespace Arctium_Connection_Patcher.Patcher
             Legacy    = 0x38E64A,
             Email     = 0x6534F4,
             User      = 0x240D48,
-            RaF       = 0x65341C    
+            RaF       = 0x65341C
         }
         public enum x64
         {
@@ -37,7 +37,8 @@ namespace Arctium_Connection_Patcher.Patcher
             Movement3 = 0x59AFA3,
             Legacy    = 0x59AF7A,
             Email     = 0xA5F70D,
-            User      = 0x39A2F0
+            User      = 0x39A2F0,
+            RaF       = 0xA5F529
         }
     }
 }
