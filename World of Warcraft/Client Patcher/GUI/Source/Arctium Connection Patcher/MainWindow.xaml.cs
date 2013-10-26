@@ -112,6 +112,7 @@ namespace Arctium_Connection_Patcher
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.Legacy, Patcher.Bytes.Legacy, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.Email, Patcher.Bytes.Email, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.User, Patcher.Bytes.User, ref StateBox);
+                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.RaF, Patcher.Bytes.RaF, ref StateBox);
                 }
 
                 Patcher.Patcher.Dispose();
