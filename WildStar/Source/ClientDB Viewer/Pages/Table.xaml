@@ -1,0 +1,26 @@
+﻿<Page x:Class="Arctium_ClientDB_Viewer.Pages.Table"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Title="Table" Loaded="Page_Loaded">
+
+    <Grid VerticalAlignment="Stretch">
+        <ProgressBar Name="ProgressBar" BorderBrush="{x:Null}" BorderThickness="0,0,0,0" Height="2" VerticalAlignment="Top" Foreground="#FF5BC0DE" Background="Transparent" />
+        <DataGrid Name="DBData" HorizontalContentAlignment="Stretch" EnableColumnVirtualization="True" EnableRowVirtualization="True"
+                  VerticalContentAlignment="Stretch" VirtualizingStackPanel.IsVirtualizing="true"
+                  ScrollViewer.IsDeferredScrollingEnabled="True"
+                  AutoGenerateColumns="True"
+                  IsSynchronizedWithCurrentItem="False"
+                  CanUserAddRows="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeColumns="False"
+                  DockPanel.Dock="Bottom"
+                  HorizontalGridLinesBrush="#FF878787"
+                  MinRowHeight="23"
+                  SelectionUnit="Cell"
+                  IsReadOnly="True"
+                  VerticalGridLinesBrush="#FF878787" Visibility="Visible" BorderThickness="0" Margin="0,2,0,-2" />
+    </Grid>
+</Page>
