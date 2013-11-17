@@ -153,7 +153,7 @@ namespace Arctium_ClientDB_Viewer.Reader
 
                                             var lastPosition = dbReader.BaseStream.Position;
 
-                                            dbReader.BaseStream.Position = (long)(stringOffset2 + firstEntryPos);
+                                            dbReader.BaseStream.Position = (long)((stringOffset > 0 ? stringOffset : stringOffset2) + firstEntryPos);
 
                                             row[column.Name] = dbReader.ReadWString();
 
