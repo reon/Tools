@@ -126,6 +126,7 @@ namespace Arctium_ClientDB_Viewer.Reader
                             for (uint i = 0; i < header.RecordCount; i++)
                             {
                                 var row = table.NewRow();
+                                var lastType = 0;
 
                                 dbReader.BaseStream.Position = (long)((long)firstEntryPos + ((long)header.RecordSize * i));
 
@@ -133,9 +134,13 @@ namespace Arctium_ClientDB_Viewer.Reader
                                 {
                                     var column = columns[j];
 
+                                    if (column.DataType != 130 && lastType == 130)
+                                        dbReader.BaseStream.Position += 4;
+
                                     switch (column.DataType)
                                     {
                                         case 3:
+
                                             row[column.Name] = dbReader.ReadUInt32();
                                             break;
                                         case 4:
@@ -162,6 +167,8 @@ namespace Arctium_ClientDB_Viewer.Reader
                                         default:
                                             break;
                                     }
+
+                                    lastType = column.DataType;
                                 }
 
                                 table.Rows.Add(row);
