@@ -35,6 +35,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\PEHeader.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="Patcher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

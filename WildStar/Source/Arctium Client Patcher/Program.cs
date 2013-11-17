@@ -35,7 +35,11 @@ namespace Arctium_Client_Patcher
                 switch (command)
                 {
                     case "watermark":
-                        var offset = 0xA61F;
+                        var offsets = new long[2] { 0xA61F, 0xE5EB };
+                        var isAMD64 = Helper.IsAMD64(args[0]);
+                        var offset = isAMD64 ? offsets[1] : offsets[0];
+
+                        Console.WriteLine("Type: {0}", isAMD64 ? "AMD64" : "I386");
 
                         if (patcher.Initialized && patcher.CheckAddress(offset, 0xEB))
                             patcher.Patch(offset, 0xEB);
