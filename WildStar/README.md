@@ -1,5 +1,10 @@
 WildStar tools.
 
+Using some of these tools is against the terms of service and<br />
+sharing ingame content is against the NDA from Carbine.<br />
+Arctium won't be responsible for anything you do with this tool and<br />
+and the consequences.
+
 Client Loader:<br />
 1. Load the latest Client (x86 & x64) binaries.<br />
 2. Checks for builds higher than the official.<br />
