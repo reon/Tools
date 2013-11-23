@@ -1,23 +1,93 @@
-﻿<Page x:Name="page" x:Class="Arctium_ClientDB_Viewer.Pages.Overview"
+﻿<Page x:Class="Arctium_ClientDB_Viewer.Pages.Overview"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      mc:Ignorable="d" PresentationOptions:Freeze="true" 
-      HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Title="Overview" Foreground="#FF363636">
+      xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      x:Name="page"
+      Title="Overview"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Stretch"
+      Foreground="#FF363636"
+      PresentationOptions:Freeze="true"
+      mc:Ignorable="d">
 
-    <Grid AllowDrop="True" VerticalAlignment="Stretch" PreviewDrop="File_PreviewDrop">
-        <TextBlock Name="Click" Style="{DynamicResource ModernUITextBlock}" Visibility="Hidden" Margin="454,223,270,0" TextWrapping="Wrap" Text="Click" HorizontalAlignment="Center" VerticalAlignment="Top" Cursor="None" Width="268"/>
-        <TextBlock Name="Or" Style="{DynamicResource ModernUITextBlock}" Visibility="Hidden" Margin="471,254,253,0" TextWrapping="Wrap" Text="or" HorizontalAlignment="Center" VerticalAlignment="Top" Cursor="None" Width="268"/>
+    <Grid VerticalAlignment="Stretch"
+          AllowDrop="True"
+          PreviewDrop="File_PreviewDrop">
+        <TextBlock Name="Click"
+                   Width="268"
+                   Margin="454,223,270,0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Cursor="None"
+                   Style="{DynamicResource ModernUITextBlock}"
+                   Text="Click"
+                   TextWrapping="Wrap"
+                   Visibility="Hidden" />
+        <TextBlock Name="Or"
+                   Width="268"
+                   Margin="471,254,253,0"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Cursor="None"
+                   Style="{DynamicResource ModernUITextBlock}"
+                   Text="or"
+                   TextWrapping="Wrap"
+                   Visibility="Hidden" />
 
-        <Image Name="FileImg" AllowDrop="True" HorizontalAlignment="Center" Source="/Arctium ClientDB Viewer;component/Images/dragndrop.png" Height="256" Margin="364,136,372,0" Width="256" VerticalAlignment="Top" MouseEnter="Image_MouseEnter" MouseLeave="Image_MouseLeave" Opacity="0.7" MouseLeftButtonUp="FileImg_MouseLeftButtonUp"/>
-        <TextBlock Name="DragnDrop" Style="{DynamicResource ModernUITextBlock}" Visibility="Hidden" Margin="392,378,332,-31" TextWrapping="Wrap" Text="Drag 'n Drop" HorizontalAlignment="Center" VerticalAlignment="Top" Cursor="None" Width="268"/>
-        <TextBlock Name="YFiles" Style="{DynamicResource ModernUITextBlock}" Visibility="Hidden" Margin="420,417,324,-70" TextWrapping="Wrap" Text="Your files" HorizontalAlignment="Center" VerticalAlignment="Top" Cursor="None" Width="248"/>
-        <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Visibility="Hidden" Name="FileView" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" BorderThickness="0" ClipToBounds="True" SnapsToDevicePixels="True" Margin="0,0,0,0" SelectionChanged="FileView_SelectionChanged" SelectionMode="Single">
+        <Image Name="FileImg"
+               Width="256"
+               Height="256"
+               Margin="364,136,372,0"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Top"
+               AllowDrop="True"
+               MouseEnter="Image_MouseEnter"
+               MouseLeave="Image_MouseLeave"
+               MouseLeftButtonUp="FileImg_MouseLeftButtonUp"
+               Opacity="0.7"
+               Source="/Arctium ClientDB Viewer;component/Images/dragndrop.png" />
+        <TextBlock Name="DragnDrop"
+                   Width="268"
+                   Margin="392,378,332,-31"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Cursor="None"
+                   Style="{DynamicResource ModernUITextBlock}"
+                   Text="Drag 'n Drop"
+                   TextWrapping="Wrap"
+                   Visibility="Hidden" />
+        <TextBlock Name="YFiles"
+                   Width="248"
+                   Margin="420,417,324,-70"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Cursor="None"
+                   Style="{DynamicResource ModernUITextBlock}"
+                   Text="Your files"
+                   TextWrapping="Wrap"
+                   Visibility="Hidden" />
+        <ListView Name="FileView"
+                  Margin="0,0,0,0"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  Background="White"
+                  BorderThickness="0"
+                  ClipToBounds="True"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  SelectionChanged="FileView_SelectionChanged"
+                  SelectionMode="Single"
+                  SnapsToDevicePixels="True"
+                  Visibility="Hidden">
             <ListView.ItemsPanel>
-                <ItemsPanelTemplate >
-                    <WrapPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Horizontal" ItemHeight="128" ItemWidth="128" />
+                <ItemsPanelTemplate>
+                    <WrapPanel HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch"
+                               ItemHeight="128"
+                               ItemWidth="128"
+                               Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
@@ -29,15 +99,22 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" />
+                        <Border x:Name="border"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter x:Name="contentPresenter"
+                                              Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              Focusable="False" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#FF909090"/>
+                                <Setter TargetName="border" Property="Background" Value="#FF909090" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#FF909090"/>
+                                <Setter TargetName="border" Property="Background" Value="#FF909090" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -53,7 +130,10 @@
                     <Trigger.EnterActions>
                         <BeginStoryboard>
                             <Storyboard>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0.0" To="0.85" Duration="0:0:0.9"/>
+                                <DoubleAnimation Duration="0:0:0.9"
+                                                 From="0.0"
+                                                 Storyboard.TargetProperty="Opacity"
+                                                 To="0.85" />
                             </Storyboard>
                         </BeginStoryboard>
                     </Trigger.EnterActions>

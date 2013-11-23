@@ -186,8 +186,8 @@ namespace Arctium_ClientDB_Viewer.Reader
                             Globals.DBTables.TryUpdate(Globals.SelectedItem, table, null);
                         }
 
+                        dp.Invoke(new Action(() => dg.ItemsSource = table.DefaultView), DispatcherPriority.DataBind);
                         dp.Invoke(new Action(() => progressBar.Value = 100.0), DispatcherPriority.Send);
-                        dp.Invoke(new Action(() => dg.ItemsSource = table.DefaultView), DispatcherPriority.Normal);
                     }
                 }
                 catch (Exception ex)
