@@ -96,21 +96,14 @@ namespace Arctium_Connection_Patcher
 
                 if (Patcher.Patcher.Is64Bit)
                 {
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x64.Movement, Patcher.Bytes.Movement, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x64.Movement2, Patcher.Bytes.Movement, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x64.Movement3, Patcher.Bytes.Movement, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x64.Legacy, Patcher.Bytes.Legacy, ref StateBox);
+                    Patcher.Patcher.Patch((int)Patcher.Offset.x64.Send, Patcher.Bytes.Sendx64, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.Email, Patcher.Bytes.Email, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.User, Patcher.Bytes.User, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x64.RaF, Patcher.Bytes.RaF, ref StateBox);
                 }
                 else
                 {
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement, Patcher.Bytes.Movement, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement2, Patcher.Bytes.Movement2, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement3, Patcher.Bytes.Movement, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.Movement4, Patcher.Bytes.Movement, ref StateBox);
-                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.Legacy, Patcher.Bytes.Legacy, ref StateBox);
+                    Patcher.Patcher.Patch((int)Patcher.Offset.x86.Send, Patcher.Bytes.Sendx86, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.Email, Patcher.Bytes.Email, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.User, Patcher.Bytes.User, ref StateBox);
                     Patcher.Patcher.Patch((int)Patcher.Offset.x86.RaF, Patcher.Bytes.RaF, ref StateBox);
