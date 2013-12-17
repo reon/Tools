@@ -66,15 +66,14 @@ namespace Connection_Patcher
                             patcher.Finish();
                             break;
                         case BinaryTypes.Mach64:
-                            // Patterns not done...
-                            /*patcher.Patch(Patches.Mac.x64.Send, Patterns.Mac.x64.Send);
+                            patcher.Patch(Patches.Mac.x64.Send, Patterns.Mac.x64.Send);
                             patcher.Patch(Patches.Mac.x64.Email, Patterns.Mac.x64.Email);
                             patcher.Patch(Patches.Mac.x64.User, Patterns.Mac.x64.User);
                             patcher.Patch(Patches.Mac.x64.RaF, Patterns.Mac.x64.RaF);
 
                             patcher.Binary = patcher.Binary + " Patched";
                              
-                            patcher.Finish();*/
+                            patcher.Finish();
                             break;
                         default:
                             throw new NotSupportedException("Type: " + patcher.Type + " not supported!");

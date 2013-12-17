@@ -24,7 +24,7 @@ namespace Connection_Patcher.Patches
             public static byte[] Send  = { 0x31, 0xC9, 0x90 };
             public static byte[] Email = { 0xEB };
             public static byte[] User  = { 0x00 };
-            public static byte[] RaF   = { 0x31, 0xC0, 0xEB, 0x47, 0x90, 0x90 };
+            public static byte[] RaF   = { 0x31, 0xC0, 0xEB, 0x72, 0x90 };
         }
 
         public static class x64
@@ -32,7 +32,7 @@ namespace Connection_Patcher.Patches
             public static byte[] Send  = { 0x31, 0xC9, 0x90 };
             public static byte[] Email = { 0xEB };
             public static byte[] User  = { 0x00 };
-            public static byte[] RaF   = { 0x30, 0xDB, 0x31, 0xC0, 0xE9, 0xC6, 0x02, 0x00, 0x00, 0x90, 0x90 };
+            public static byte[] RaF   = { 0x31, 0xC0, 0xE9, 0xE5, 0x02, 0x00, 0x00 };
         }
     }
 }
