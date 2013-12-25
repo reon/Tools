@@ -27,7 +27,7 @@ namespace Arctium_Injector
         {
             // Default World of Warcraft process name
             var processName = "WoW";
-            var dll = "Ijh.dll";
+            var dll = "AwpsHost.dll";
 
             if (args.Length == 1)
                 processName = Path.GetFileNameWithoutExtension(args[0]);
