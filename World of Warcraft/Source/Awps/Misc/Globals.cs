@@ -25,9 +25,9 @@ namespace Awps
         public static byte[] Send = { 0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x10, 0x53, 0x56, 0x8B, 0xF1, 0x8D, 0x8E };
         public static byte[] Receive = { 0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x18, 0xFF, 0x05, 0x00, 0x00, 0x00, 0x00, 0x53 };
 
-        public static IntPtr ReceiveAddress = (IntPtr)0x397786;
-        public static IntPtr SendAddress = (IntPtr)0x39993E;
+        public static IntPtr ReceiveAddress = (IntPtr)0x398482;
+        public static IntPtr SendAddress = (IntPtr)0x39A66A;
 
-        public static string Version = "AWPS 1.0 for WoW Build 17930";
+        public static string Version = "AWPS 1.0 for WoW Build 17956";
     }
 }
