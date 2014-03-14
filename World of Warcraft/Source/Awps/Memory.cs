@@ -75,7 +75,7 @@ namespace Awps
 
                 Native.VirtualProtect(address, (uint)data.Length, 0x80, out oldProtect);
 
-                var realAddress = new IntPtr((uint)address);
+                var realAddress = new IntPtr((long)address);
 
                 Native.WriteProcessMemory(currentProcess.Handle, realAddress, data, data.Length);
 

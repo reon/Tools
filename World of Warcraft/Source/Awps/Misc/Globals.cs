@@ -22,12 +22,13 @@ namespace Awps
     class Globals
     {
         // We'll use them in a future update
-        public static byte[] Send = { 0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x10, 0x53, 0x56, 0x8B, 0xF1, 0x8D, 0x8E };
-        public static byte[] Receive = { 0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x18, 0xFF, 0x05, 0x00, 0x00, 0x00, 0x00, 0x53 };
+        public static byte[] Send = { 0 };
+        public static byte[] Receive = { 0 };
+        
+        // { x86, x64 }
+        public static long[] ReceiveAddresses = { 0x3986FB, 0x5AB880 };
+        public static long[] SendAddresses = { 0x39A8E3, 0x5AEF00 };
 
-        public static IntPtr ReceiveAddress = (IntPtr)0x3986FB;
-        public static IntPtr SendAddress = (IntPtr)0x39A8E3;
-
-        public static string Version = "AWPS 1.0 for WoW Build 18019";
+        public static string Version = "AWPS 1.2 for WoW Build 18019";
     }
 }

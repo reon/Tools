@@ -27,20 +27,49 @@ namespace Awps
         [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
         delegate uint ClientReceiveDummy(IntPtr ptr, IntPtr arg, ref CDataStore dataStore, IntPtr arg2);
 
-        static ClientReceiveDummy originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr((uint)Globals.ReceiveAddress + (uint)Memory.BaseAddress), typeof(ClientReceiveDummy)) as ClientReceiveDummy;
+        static ClientReceiveDummy originalDelegate;
         static ClientReceiveDummy hookDelegate = new ClientReceiveDummy(ClientReceive);
 
-        #region Detour
         static IntPtr originalFunction;
         static IntPtr hookFunction;
 
-        // Length = 5
-        static byte[] originalInstruction = new byte[5];
-        static byte[] hookInstruction = new byte[5];
-        #endregion
+        int instructionLength;
+
+        static byte[] originalInstruction;
+        static byte[] hookInstruction;
 
         public ReceiveHook()
         {
+            long address;
+
+            if (Environment.Is64BitProcess)
+            {
+                instructionLength = 12;
+
+                originalInstruction = new byte[instructionLength];
+                hookInstruction = new byte[instructionLength];
+
+                address = Globals.ReceiveAddresses[1];
+
+                hookInstruction[0] = 0x48;
+                hookInstruction[1] = 0xB8;
+                hookInstruction[10] = 0xFF;
+                hookInstruction[11] = 0xE0;
+            }
+            else
+            {
+                instructionLength = 5;
+
+                originalInstruction = new byte[instructionLength];
+                hookInstruction = new byte[instructionLength];
+
+                address = Globals.ReceiveAddresses[0];
+
+                hookInstruction[0] = 0xE9;
+            }
+
+            originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientReceiveDummy)) as ClientReceiveDummy;
+
             Console.WriteLine("Initialize Receive hook...");
 
             // Assign function pointers
@@ -48,13 +77,16 @@ namespace Awps
             hookFunction = Marshal.GetFunctionPointerForDelegate(hookDelegate);
 
             // Store original & hook instructions
-            Buffer.BlockCopy(Memory.Read(originalFunction, 5), 0, originalInstruction, 0, 5);
+            Buffer.BlockCopy(Memory.Read(originalFunction, instructionLength), 0, originalInstruction, 0, instructionLength);
 
-            var hookOffset = hookFunction.ToInt64() - (originalFunction.ToInt64() + 5);
+            if (Environment.Is64BitProcess)
+                Buffer.BlockCopy(BitConverter.GetBytes(hookFunction.ToInt64()), 0, hookInstruction, 2, 8);
+            else
+            {
+                var hookOffset = hookFunction.ToInt64() - (originalFunction.ToInt64() + instructionLength);
 
-            Buffer.BlockCopy(BitConverter.GetBytes((uint)hookOffset), 0, hookInstruction, 1, 4);
-
-            hookInstruction[0] = 0xE9;
+                Buffer.BlockCopy(BitConverter.GetBytes((uint)hookOffset), 0, hookInstruction, 1, 4);
+            }
 
             Memory.Write(originalFunction, hookInstruction);
 

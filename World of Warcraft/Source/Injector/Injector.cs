@@ -26,7 +26,7 @@ namespace Arctium_Injector
         static void Main(string[] args)
         {
             // Default World of Warcraft process name
-            var processName = "WoW";
+            var processName = Environment.Is64BitProcess ? "WoW-64" : "WoW";
             var dll = "AwpsHost.dll";
 
             if (args.Length == 1)
