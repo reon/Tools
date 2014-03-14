@@ -49,7 +49,7 @@ namespace Awps
                 originalInstruction = new byte[instructionLength];
                 hookInstruction = new byte[instructionLength];
 
-                address = Globals.ReceiveAddresses[1];
+                address = Globals.SendAddresses[1];
 
                 hookInstruction[0] = 0x48;
                 hookInstruction[1] = 0xB8;
@@ -63,7 +63,7 @@ namespace Awps
                 originalInstruction = new byte[instructionLength];
                 hookInstruction = new byte[instructionLength];
 
-                address = Globals.ReceiveAddresses[0];
+                address = Globals.SendAddresses[0];
 
                 hookInstruction[0] = 0xE9;
             }
