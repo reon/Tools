@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E97A2D8E-ADF6-4D2E-B33B-F74701094CFA}</ProjectGuid>
+    <ProjectGuid>{1ABEA1DC-458D-411F-9422-F20654419222}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Connection_Patcher</RootNamespace>
-    <AssemblyName>Connection Patcher</AssemblyName>
+    <AssemblyName>Connection Patcher WoD</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -23,6 +23,13 @@
     <PlatformTarget>x64</PlatformTarget>
     <OutputPath>..\Compiled\Release_x64\</OutputPath>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

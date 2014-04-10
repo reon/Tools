@@ -17,6 +17,7 @@
 
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using Connection_Patcher.Constants;
 
 namespace Connection_Patcher
@@ -58,6 +59,17 @@ namespace Connection_Patcher
             }
 
             return type;
+        }
+
+        public static string GetFileChecksum(byte[] data)
+        {
+            using(var stream = new BufferedStream(new MemoryStream(data), 1200000))
+            {
+                var sha256 = new SHA256Managed();
+                var checksum = sha256.ComputeHash(stream);
+
+                return BitConverter.ToString(checksum).Replace("-", "").ToLower();
+            }
         }
     }
 }

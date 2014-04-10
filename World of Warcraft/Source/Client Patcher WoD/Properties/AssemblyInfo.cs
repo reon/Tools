@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Awps")]
+[assembly: AssemblyTitle("Connection Patcher")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Awps")]
-[assembly: AssemblyCopyright("Copyright © 2012-2014 Arctium Emulation")]
+[assembly: AssemblyProduct("Connection Patcher")]
+[assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ad0eb93e-a5ce-4339-99ca-07c06a0b5c2f")]
+[assembly: Guid("07c6905b-5b42-4804-81fe-73d0f74ebfb1")]
 
 // Version information for an assembly consists of the following four values:
 //

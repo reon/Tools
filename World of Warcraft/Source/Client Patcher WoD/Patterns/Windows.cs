@@ -1,4 +1,4 @@
-﻿/*
+﻿﻿/*
  * Copyright (C) 2012-2014 Arctium Emulation <http://arctium.org>
  * 
  * This program is free software: you can redistribute it and/or modify
@@ -15,20 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-
-namespace Awps
+namespace Connection_Patcher.Patterns
 {
-    class Globals
+    class Windows
     {
-        // We'll use them in a future update
-        public static byte[] Send = { 0 };
-        public static byte[] Receive = { 0 };
-        
-        // { x86, x64 }
-        public static long[] ReceiveAddresses = { 0x3986FB, 0x5AB880 };
-        public static long[] SendAddresses = { 0x39A8E3, 0x5AEF00 };
+        public static class x86
+        {
+            public static byte[] BNet      = { 0x8B, 0x75, 0x08, 0x8D, 0x78, 0x0C };
+            public static byte[] Send      = { 0x8B, 0x45, 0xF4, 0x48, 0x8B, 0xC8 };
+            public static byte[] Password  = { 0x74, 0x89, 0x8B, 0x16, 0x8B, 0x42, 0x04 };
+            public static byte[] Signature = { 0xE8, 0x00, 0x00, 0x00, 0x00, 0x84, 0xC0, 0x75, 0x5F, 0x33, 0xC0 };
+            
+        }
 
-        public static string Version = "AWPS 1.2 for WoW Build 18019";
+        public static class x64
+        {
+            public static byte[] BNet = { };
+        }
     }
 }

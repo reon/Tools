@@ -27,7 +27,7 @@ namespace Connection_Patcher
         public bool Initialized { get; private set; }
         public BinaryTypes Type { get; private set; }
 
-        byte[] binary;
+        public byte[] binary;
         bool success;
 
         public Patcher(string file)
@@ -49,11 +49,11 @@ namespace Connection_Patcher
             }
         }
 
-        public void Patch(byte[] bytes, byte[] pattern)
+        public void Patch(byte[] bytes, byte[] pattern, long address = 0)
         {
-            if (Initialized && binary.Length >= pattern.Length)
+            if (Initialized && (address != 0 || binary.Length >= pattern.Length))
             {
-                var offset = SearchOffset(pattern);
+                var offset = pattern == null ? address : SearchOffset(pattern);
 
                 if (offset != 0 && binary.Length >= bytes.Length)
                 {

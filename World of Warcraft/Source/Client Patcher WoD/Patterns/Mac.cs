@@ -15,20 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-
-namespace Awps
+namespace Connection_Patcher.Patterns
 {
-    class Globals
+    class Mac
     {
-        // We'll use them in a future update
-        public static byte[] Send = { 0 };
-        public static byte[] Receive = { 0 };
-        
-        // { x86, x64 }
-        public static long[] ReceiveAddresses = { 0x3986FB, 0x5AB880 };
-        public static long[] SendAddresses = { 0x39A8E3, 0x5AEF00 };
+        public static class x86
+        {
+            public static byte[] BNet = { };
+        }
 
-        public static string Version = "AWPS 1.2 for WoW Build 18019";
+        public static class x64
+        {
+            public static byte[] BNet = { };
+        }
     }
 }
