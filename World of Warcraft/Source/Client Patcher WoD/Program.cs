@@ -42,21 +42,12 @@ namespace Connection_Patcher
                     {
                         Console.WriteLine("Base module doesn't exist, downloading it...");
 
-                        if (!Directory.Exists(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/8f"))
-                        {
-                            Directory.CreateDirectory(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/8f");
+                        if (!Directory.Exists(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/8f/52"))
                             Directory.CreateDirectory(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/8f/52");
-                        }
-                        else if (!Directory.Exists(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/8f/52"))
-                            Directory.CreateDirectory(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/8f/52");
-
 
                         var webClient = new WebClient();
 
-                        webClient.DownloadFileCompleted += (o, e) =>
-                        {
-                            Patch(args, modulePath, commonAppData);
-                        };
+                        webClient.DownloadFileCompleted += (o, e) => Patch(args, modulePath, commonAppData);
 
                         webClient.DownloadFileAsync(new Uri("http://xx.depot.battle.net:1119/8f52906a2c85b416a595702251570f96d3522f39237603115f2f1ab24962043c.auth"), modulePath);
 
@@ -92,15 +83,7 @@ namespace Connection_Patcher
                         {
                             patcher2.Patch(Patches.Windows.x86.Password, Patterns.Windows.x86.Password);
 
-                            if (!Directory.Exists(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache"))
-                                Directory.CreateDirectory(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache");
-
-                            if (!Directory.Exists(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/2e"))
-                            {
-                                Directory.CreateDirectory(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/2e");
-                                Directory.CreateDirectory(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/2e/6d");
-                            }
-                            else if (!Directory.Exists(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/2e/6d"))
+                            if (!Directory.Exists(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/2e/6d"))
                                 Directory.CreateDirectory(commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/2e/6d");
 
                             patcher2.Binary = commonAppData + "/" + "Blizzard Entertainment/Battle.net/Cache/2e/6d/" + Helper.GetFileChecksum(patcher2.binary) + ".auth";
