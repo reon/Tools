@@ -63,7 +63,7 @@ namespace Connection_Patcher
 
         public static string GetFileChecksum(byte[] data)
         {
-            using(var stream = new BufferedStream(new MemoryStream(data), 1200000))
+            using (var stream = new BufferedStream(new MemoryStream(data), 1200000))
             {
                 var sha256 = new SHA256Managed();
                 var checksum = sha256.ComputeHash(stream);
