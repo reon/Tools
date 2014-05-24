@@ -15,11 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System;
 using System.IO;
 
 namespace Awps.Structures
 {
-    class Packet
+    class Packet : IDisposable
     {
         public uint TimeStamp { get; set; }
         public uint Message { get; set; }
@@ -42,6 +43,11 @@ namespace Awps.Structures
 
                 Data = stream.ReadBytes(size);
             }
+        }
+
+        public void Dispose()
+        {
+            stream.Dispose();
         }
     }
 }

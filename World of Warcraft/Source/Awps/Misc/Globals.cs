@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
-
 namespace Awps
 {
     class Globals
@@ -26,9 +24,9 @@ namespace Awps
         public static byte[] Receive = { 0 };
         
         // { x86, x64 }
-        public static long[] ReceiveAddresses = { 0x3986FB, 0x5AB880 };
-        public static long[] SendAddresses = { 0x39A8E3, 0x5AEF00 };
+        public static long[] ReceiveAddresses = { 0x397CC3, 0x5AAA40 };
+        public static long[] SendAddresses = { 0x799DCD, 0x5AE050 };
 
-        public static string Version = "AWPS 1.2 for WoW Build 18019";
+        public static string Version = "AWPS 1.3 for WoW Build 18219";
     }
 }

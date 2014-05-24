@@ -53,7 +53,7 @@ namespace Awps
             {
                 var buffer = new byte[size];
 
-                Native.ReadProcessMemory(currentHandle, address, buffer, size);
+                NativeMethods.ReadProcessMemory(currentHandle, address, buffer, size);
 
                 return buffer;
 
@@ -73,14 +73,14 @@ namespace Awps
             {
                 uint oldProtect;
 
-                Native.VirtualProtect(address, (uint)data.Length, 0x80, out oldProtect);
+                NativeMethods.VirtualProtect(address, (uint)data.Length, 0x80, out oldProtect);
 
                 var realAddress = new IntPtr((long)address);
 
-                Native.WriteProcessMemory(currentProcess.Handle, realAddress, data, data.Length);
+                NativeMethods.WriteProcessMemory(currentProcess.Handle, realAddress, data, data.Length);
 
-                Native.FlushInstructionCache(currentHandle, address, (uint)data.Length);
-                Native.VirtualProtect(address, (uint)data.Length, oldProtect, out oldProtect);
+                NativeMethods.FlushInstructionCache(currentHandle, address, (uint)data.Length);
+                NativeMethods.VirtualProtect(address, (uint)data.Length, oldProtect, out oldProtect);
             }
             catch (Exception ex)
             {

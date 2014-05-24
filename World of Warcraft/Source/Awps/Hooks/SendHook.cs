@@ -68,9 +68,6 @@ namespace Awps
                 hookInstruction[0] = 0xE9;
             }
 
-            originalInstruction = new byte[instructionLength];
-            hookInstruction = new byte[instructionLength];
-
             originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientSendDummy)) as ClientSendDummy;
 
             Console.WriteLine("Initialize Send hook...");
@@ -110,6 +107,16 @@ namespace Awps
             Memory.Write(originalFunction, hookInstruction);
 
             return (uint)ret;
+        }
+
+        public void Start()
+        {
+            Memory.Write(originalFunction, hookInstruction);
+        }
+
+        public void Remove()
+        {
+            Memory.Write(originalFunction, originalInstruction);
         }
     }
 }

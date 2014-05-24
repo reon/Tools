@@ -59,7 +59,7 @@
     <Compile Include="Hooks\ReceiveHook.cs" />
     <Compile Include="Log\FileLog.cs" />
     <Compile Include="Memory.cs" />
-    <Compile Include="Misc\Native.cs" />
+    <Compile Include="Misc\NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Structures\CDataStore.cs" />
     <Compile Include="Structures\Packet.cs" />

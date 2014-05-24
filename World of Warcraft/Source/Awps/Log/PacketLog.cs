@@ -26,26 +26,62 @@ namespace Awps.Log
 {
     class PacketLog
     {
+        public static bool IsLogTaskInitialized { get; set; }
+        public static bool IsRunning { get; set; }
+
         static FileLog logger;
         static BlockingCollection<string> logQueue = new BlockingCollection<string>();
 
         public static async void Initialize(string directory, string file)
         {
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
-
-            logger = new FileLog(directory, file);
-
-            await Task.Delay(1).ContinueWith(async _ =>
+            if (!IsRunning)
             {
-                while (true)
+                while (logQueue.Count > 0)
                 {
                     var log = logQueue.Take();
 
-                    if (log != null)
+                    if (log != null && log != "")
                         await logger.Write(log);
                 }
-            });
+
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                if (logger == null)
+                {
+                    logger = new FileLog(directory, file);
+                    PacketLog.StartLogTask();
+                }
+                else
+                {
+                    logger.Dispose();
+                    logger.SetLogFile(directory, file);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Log Task is still active, please wait a few seconds");
+                return;
+            }
+        }
+
+        public static async void StartLogTask()
+        {
+            if (!IsLogTaskInitialized)
+            {
+                await Task.Delay(1).ContinueWith(async _ =>
+                {
+                    while (true)
+                    {
+                        var log = logQueue.Take();
+
+                        if (log != null && log != "")
+                            await logger.Write(log);
+                    }
+                });
+
+                IsLogTaskInitialized = true;
+            }
         }
 
         public static async void Write(Packet packet, string type)
@@ -55,7 +91,7 @@ namespace Awps.Log
                 var sb = new StringBuilder();
 
                 sb.Append(string.Format("Time: {0};OpcodeType: {1};OpcodeValue: {2};Packet: ", packet.TimeStamp, type, packet.Message));
-                
+
                 foreach (var b in packet.Data)
                     sb.Append(string.Format("{0:X2}", b));
 

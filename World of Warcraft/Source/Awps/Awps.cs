@@ -17,12 +17,16 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading;
 using Awps.Log;
 
 namespace Awps
 {
     public class Awps
     {
+        static ReceiveHook receive;
+        static SendHook send;
+
         public static int EntryPoint(string args)
         {
             Process.EnterDebugMode();
@@ -52,23 +56,49 @@ namespace Awps
 
         public static void ReadCommands()
         {
-            var command = Console.ReadLine().ToLower();
-
-            switch (command)
+            while (true)
             {
-                case "start":
-                    PacketLog.Initialize("PacketDumps", "Dump");
+                Thread.Sleep(1);
 
-                    Console.WriteLine("Starting Arctium WoW Packet Sniffer...");
+                Console.WriteLine("AWPS >> ");
 
-                    new ReceiveHook();
-                    new SendHook();
+                var command = Console.ReadLine().ToLower();
 
-                    break;
-                default:
-                    Console.WriteLine("Command '{0}' not supported!", command);
-                    ReadCommands();
-                    break;
+                switch (command)
+                {
+                    case "start":
+                        PacketLog.Initialize("PacketDumps", "Dump");
+
+                        Console.WriteLine("Starting Arctium WoW Packet Sniffer...");
+
+                        if (!PacketLog.IsRunning)
+                        {
+                            if (receive == null)
+                                receive = new ReceiveHook();
+                            else
+                                receive.Start();
+
+                            if (send == null)
+                                send = new SendHook();
+                            else
+                                send.Start();
+
+                            PacketLog.IsRunning = true;
+                        }
+
+                        break;
+                    case "stop":
+                        receive.Remove();
+                        send.Remove();
+
+                        PacketLog.IsRunning = false;
+
+                        break;
+                    default:
+                        Console.WriteLine("Command '{0}' not supported!", command);
+                        ReadCommands();
+                        break;
+                }
             }
         }
     }

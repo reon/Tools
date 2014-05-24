@@ -108,5 +108,15 @@ namespace Awps
 
             return (uint)ret;
         }
+
+        public void Start()
+        {
+            Memory.Write(originalFunction, hookInstruction);
+        }
+
+        public void Remove()
+        {
+            Memory.Write(originalFunction, originalInstruction);
+        }
     }
 }

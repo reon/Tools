@@ -27,9 +27,9 @@ namespace Awps
     {
         public static void InitializeConsole()
         {
-            Native.AllocConsole();
+            NativeMethods.AllocConsole();
 
-            var stdHandle = Native.GetStdHandle(-11);
+            var stdHandle = NativeMethods.GetStdHandle(-11);
             var safeFileHandle = new SafeFileHandle(stdHandle, true);
             var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
             var standardOutput = new StreamWriter(fileStream, Encoding.UTF8);

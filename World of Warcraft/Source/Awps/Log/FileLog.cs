@@ -34,6 +34,13 @@ namespace Awps.Log
             logStream = new FileStream(LogFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, true);
         }
 
+        public void SetLogFile(string directory, string file)
+        {
+            LogFile = string.Format("{0}/{1}_{2}.awps", directory, Helper.GetUnixTime(), file);
+
+            logStream = new FileStream(LogFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, true);
+        }
+
         public async Task Write(string logMessage)
         {
             var logBytes = Encoding.UTF8.GetBytes(logMessage + "\r\n");
@@ -45,6 +52,8 @@ namespace Awps.Log
         public void Dispose()
         {
             LogFile = "";
+
+            logStream.Flush();
             logStream.Dispose();
         }
     }
