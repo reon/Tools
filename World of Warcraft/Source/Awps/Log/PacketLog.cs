@@ -32,7 +32,7 @@ namespace Awps.Log
         static FileLog logger;
         static BlockingCollection<string> logQueue = new BlockingCollection<string>();
 
-        public static async void Initialize(string directory, string file)
+        public static async void Initialize(string directory, string name)
         {
             if (!IsRunning)
             {
@@ -49,13 +49,13 @@ namespace Awps.Log
 
                 if (logger == null)
                 {
-                    logger = new FileLog(directory, file);
+                    logger = new FileLog(directory, name);
                     PacketLog.StartLogTask();
                 }
                 else
                 {
                     logger.Dispose();
-                    logger.SetLogFile(directory, file);
+                    logger.SetLogFile(directory, name);
                 }
             }
             else

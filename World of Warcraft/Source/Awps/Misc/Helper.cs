@@ -47,6 +47,13 @@ namespace Awps
             return (uint)ts.TotalSeconds;
         }
 
+        public static string GetCustomTimeFormat(string format)
+        {
+            var baseDate = DateTime.Now;
+
+            return baseDate.ToString(format);
+        }
+
         public static long SearchOffset(byte[] binary, byte[] pattern)
         {
             var matches = 0;

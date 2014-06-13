@@ -62,12 +62,20 @@ namespace Awps
 
                 Console.WriteLine("AWPS >> ");
 
-                var command = Console.ReadLine().ToLower();
+                var command = Console.ReadLine();
+                var name = "";
 
-                switch (command)
+                if (command.ToLower() != "start")
+                    if (command.ToLower().StartsWith("start"))
+                    {
+                        name = command.Substring(6).Replace(@"""", "");
+                        command = "start";
+                    }
+
+                switch (command.ToLower())
                 {
                     case "start":
-                        PacketLog.Initialize("PacketDumps", "Dump");
+                        PacketLog.Initialize("PacketDumps", name != "" ? name : "Dump");
 
                         Console.WriteLine("Starting Arctium WoW Packet Sniffer...");
 

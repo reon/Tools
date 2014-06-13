@@ -28,5 +28,6 @@ namespace Awps
         public static long[] SendAddresses = { 0x799DCD, 0x5AE050 };
 
         public static string Version = "AWPS 1.3 for WoW Build 18291";
+        public static string FullVersion = "5.4.8_18291";
     }
 }

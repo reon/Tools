@@ -27,16 +27,14 @@ namespace Awps.Log
         public string LogFile { get; set; }
         FileStream logStream;
 
-        public FileLog(string directory, string file)
+        public FileLog(string directory, string name)
         {
-            LogFile = string.Format("{0}/{1}_{2}.awps", directory, Helper.GetUnixTime(), file);
-
-            logStream = new FileStream(LogFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, true);
+            SetLogFile(directory, name);
         }
 
-        public void SetLogFile(string directory, string file)
+        public void SetLogFile(string directory, string name)
         {
-            LogFile = string.Format("{0}/{1}_{2}.awps", directory, Helper.GetUnixTime(), file);
+            LogFile = string.Format("{0}/{1}_{2} - {3}.awps", directory, Globals.FullVersion, Helper.GetCustomTimeFormat("MMMM-dd-Hmm"), name);
 
             logStream = new FileStream(LogFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, true);
         }
