@@ -24,10 +24,10 @@ namespace Awps
         public static byte[] Receive = { 0 };
         
         // { x86, x64 }
-        public static long[] ReceiveAddresses = { 0x397CC3, 0x5AAA40 };
-        public static long[] SendAddresses = { 0x799DCD, 0x5AE050 };
+        public static long[] ReceiveAddresses = { 0x397CEE, 0x5AAB60 };
+        public static long[] SendAddresses = { 0x399DF8, 0x5AE170 };
 
-        public static string Version = "AWPS 1.3 for WoW Build 18291";
-        public static string FullVersion = "5.4.8_18291";
+        public static string Version = "AWPS 1.3 for WoW Build 18414";
+        public static string FullVersion = "5.4.8_18414";
     }
 }
