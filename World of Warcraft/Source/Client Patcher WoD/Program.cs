@@ -44,15 +44,17 @@ namespace Connection_Patcher
                 var moduleFile    = "";
 
                 // Let's use Win64 as default module
-                var modulePatch      = Patches.Windows.x64.Password;
-                var modulePattern    = Patterns.Windows.x64.Password;
-                var patchBNet        = Patches.Windows.x64.BNet;
-                var patternBNet      = Patterns.Windows.x64.BNet;
-                var patchSend        = Patches.Windows.x64.Send;
-                var patternSend      = Patterns.Windows.x64.Send;
-                var patchSignature   = Patches.Windows.x64.Signature;
-                var patternSignature = Patterns.Windows.x64.Signature;
-                var fileName         = "";
+                var modulePatch       = Patches.Windows.x64.Password;
+                var modulePattern     = Patterns.Windows.x64.Password;
+                var patchBNet         = Patches.Windows.x64.BNet;
+                var patternBNet       = Patterns.Windows.x64.BNet;
+                var patchModulus      = Patches.Windows.x64.Modulus;
+                var patternModulus    = Patterns.Windows.x64.Modulus;
+                var patchConnect      = Patches.Windows.x64.Connect;
+                var patternConnect    = Patterns.Windows.x64.Connect;
+                var patchSignature    = Patches.Windows.x64.Signature;
+                var patternSignature  = Patterns.Windows.x64.Signature;
+                var fileName          = "";
 
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("Creating patched binaries for ");
@@ -65,8 +67,10 @@ namespace Connection_Patcher
                             Console.WriteLine("Win32 client...");
                             patchBNet        = Patches.Windows.x86.BNet;
                             patternBNet      = Patterns.Windows.x86.BNet;
-                            patchSend        = Patches.Windows.x86.Send;
-                            patternSend      = Patterns.Windows.x86.Send;
+                            patchModulus     = Patches.Windows.x86.Modulus;
+                            patternModulus   = Patterns.Windows.x86.Modulus;
+                            patchConnect     = Patterns.Windows.x86.Connect;
+                            patternConnect   = Patterns.Windows.x86.Connect;
                             patchSignature   = Patches.Windows.x86.Signature;
                             patternSignature = Patterns.Windows.x86.Signature;
                             fileName         = patcher.Binary.Replace(".exe", "") + "_Patched.exe";
@@ -89,8 +93,10 @@ namespace Connection_Patcher
                             Console.WriteLine("Mac client...");
                             patchBNet        = Patches.Mac.x64.BNet;
                             patternBNet      = Patterns.Mac.x64.BNet;
-                            patchSend        = Patches.Mac.x64.Send;
-                            patternSend      = Patterns.Mac.x64.Send;
+                            patchModulus     = Patches.Windows.x64.Modulus;
+                            patternModulus   = Patterns.Windows.x64.Modulus;
+                            patchConnect     = Patterns.Windows.x64.Connect;
+                            patternConnect   = Patterns.Windows.x64.Connect;
                             patchSignature   = Patches.Mac.x64.Signature;
                             patternSignature = Patterns.Mac.x64.Signature;
                             fileName         = patcher.Binary + " Patched";
@@ -106,7 +112,8 @@ namespace Connection_Patcher
                     }
 
                     patcher.Patch(patchBNet, patternBNet);
-                    patcher.Patch(patchSend, patternSend);
+                    patcher.Patch(patchModulus, patternModulus);
+                    patcher.Patch(patchConnect, patternConnect);
                     patcher.Patch(patchSignature, patternSignature);
 
                     patcher.Binary = fileName;
