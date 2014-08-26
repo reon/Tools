@@ -69,7 +69,7 @@ namespace Connection_Patcher
                             patternBNet      = Patterns.Windows.x86.BNet;
                             patchModulus     = Patches.Windows.x86.Modulus;
                             patternModulus   = Patterns.Windows.x86.Modulus;
-                            patchConnect     = Patterns.Windows.x86.Connect;
+                            patchConnect     = Patches.Windows.x86.Connect;
                             patternConnect   = Patterns.Windows.x86.Connect;
                             patchSignature   = Patches.Windows.x86.Signature;
                             patternSignature = Patterns.Windows.x86.Signature;
