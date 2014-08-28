@@ -38,8 +38,6 @@ namespace Connection_Patcher
                 Console.ReadKey(true);
 
                 var commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-                var system32      = Environment.GetFolderPath(Environment.SpecialFolder.System);
-                var hostsPath     = Path.Combine(system32, "drivers/etc/hosts");
                 var modulePath    = "";
                 var moduleFile    = "";
 
@@ -48,6 +46,8 @@ namespace Connection_Patcher
                 var modulePattern     = Patterns.Windows.x64.Password;
                 var patchBNet         = Patches.Windows.x64.BNet;
                 var patternBNet       = Patterns.Windows.x64.BNet;
+                var patchPortal       = Patches.Windows.x64.Portal;
+                var patternPortal     = Patterns.Windows.x64.Portal;
                 var patchModulus      = Patches.Windows.x64.Modulus;
                 var patternModulus    = Patterns.Windows.x64.Modulus;
                 var patchConnect      = Patches.Windows.x64.Connect;
@@ -105,13 +105,13 @@ namespace Connection_Patcher
                             moduleFile       = "97eeb2e28e9e56ed6a22d09f44e2ff43c93315e006bbad43bafc0defaa6f50ae.auth";
                             modulePatch      = Patches.Mac.x64.Password;
                             modulePattern    = Patterns.Mac.x64.Password;
-                            hostsPath        = "/private/etc/hosts";
                             break;
                         default:
                             throw new NotSupportedException("Type: " + patcher.Type + " not supported!");
                     }
 
                     patcher.Patch(patchBNet, patternBNet);
+                    patcher.Patch(patchPortal, patternPortal);
                     patcher.Patch(patchModulus, patternModulus);
                     patcher.Patch(patchConnect, patternConnect);
                     patcher.Patch(patchSignature, patternSignature);
@@ -127,58 +127,6 @@ namespace Connection_Patcher
 
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Successfully created your patched binaries.");
-                }
-
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.WriteLine("Adding host rewrite...");
-
-                var host = args.Length == 2 ? args[1] : "127.0.0.1";
-                var hostName = args.Length == 3 ? (" " + args[2] + ".logon.battle.net") : " arctium.logon.battle.net";
-                var exists = false;
-
-                using (var sr = new StreamReader(hostsPath))
-                {
-                    while (!sr.EndOfStream)
-                    {
-                        var line = sr.ReadLine();
-
-                        if (line == host + hostName)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            Console.WriteLine("Host rewrite not needed... ;)");
-
-                            exists = true;
-
-                            break;
-                        }
-                    }
-                }
-
-                if (!exists)
-                {
-                    try
-                    {
-                        using (var stream = new StreamWriter(hostsPath, true, Encoding.UTF8))
-                        {
-                            stream.WriteLine("");
-                            stream.WriteLine("{0}{1}", host, hostName);
-                        }
-
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Host rewrite successfully added.");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine(string.Format("Can't write host file! Exception type: {0}", e.GetType()));
-                        Console.WriteLine("You must add the following line:");
-
-                        Console.ForegroundColor = ConsoleColor.White;
-                        Console.WriteLine("{0}{1}", host, hostName);
-
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("to your host file before using Arctium WoD Sandbox!");
-                    }
                 }
             }
             else
