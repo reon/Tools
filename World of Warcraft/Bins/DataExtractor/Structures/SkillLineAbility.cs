@@ -4,18 +4,18 @@ namespace ClientDBExtractor.Structures
 {
     public class SkillLineAbility
     {
-        public int Id;
-        public int SkillLine;
-        public int Spell;
-        public int RaceMask;
-        public int ClassMask;
-        public int MinSkillLineRank;
-        public int SupercedesSpell;
-        public int AcquireMethod;
-        public int TrivialSkillLineRankHigh;
-        public int TrivialSkillLineRankLow;
-        public int NumSkillUps;
-        public int UniqueBit;
-        public int TradeSkillCategoryId;
+        public uint Id;
+        public uint SkillLine;
+        public uint Spell;
+        public uint RaceMask;
+        public uint ClassMask;
+        public uint MinSkillLineRank;
+        public uint SupercedesSpell;
+        public uint AcquireMethod;
+        public uint TrivialSkillLineRankHigh;
+        public uint TrivialSkillLineRankLow;
+        public uint NumSkillUps;
+        public uint UniqueBit;
+        public uint TradeSkillCategoryId;
     }
 }

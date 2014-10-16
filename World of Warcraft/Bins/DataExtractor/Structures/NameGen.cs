@@ -4,9 +4,9 @@ namespace ClientDBExtractor.Structures
 {
     public class NameGen
     {
-        public int Id;
+        public uint Id;
         public string Name;
-        public int RaceId;
-        public int Sex;
+        public uint RaceId;
+        public uint Sex;
     }
 }

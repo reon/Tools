@@ -4,20 +4,20 @@ namespace ClientDBExtractor.Structures
 {
     public class ChrClasses
     {
-        public int Id;
-        public int DisplayPower;
+        public uint Id;
+        public uint DisplayPower;
         public Unused PetNameToken;
         public Unused NameLang;
         public Unused NameFemaleLang;
         public Unused NameMaleLang;
         public Unused Filename;
-        public int SpellClassSet;
-        public int Flags;
-        public int CinematicSequenceId;
-        public int AttackPowerPerStrength;
-        public int AttackPowerPerAgility;
-        public int RangedAttackPowerPerAgility;
-        public int DefaultSpec;
+        public uint SpellClassSet;
+        public uint Flags;
+        public uint CinematicSequenceId;
+        public uint AttackPowerPerStrength;
+        public uint AttackPowerPerAgility;
+        public uint RangedAttackPowerPerAgility;
+        public uint DefaultSpec;
         public Unused CreateScreenFileDataId;
         public Unused SelectScreenFileDataId;
         public Unused LowResScreenFileDataId;

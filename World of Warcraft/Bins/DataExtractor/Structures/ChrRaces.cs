@@ -4,20 +4,20 @@ namespace ClientDBExtractor.Structures
 {
     public class ChrRaces
     {
-        public int Id;
-        public int Flags;
-        public int FactionId;
-        public int ExplorationSoundId;
-        public int MaleDisplayId;
-        public int FemaleDisplayId;
+        public uint Id;
+        public uint Flags;
+        public uint FactionId;
+        public uint ExplorationSoundId;
+        public uint MaleDisplayId;
+        public uint FemaleDisplayId;
         public Unused ClientPrefix;
-        public int BaseLanguage;
+        public uint BaseLanguage;
         public Unused CreatureType;
         public Unused ResSicknessSpellId;
         public Unused SplashSoundId;
         public Unused ClientFileString;
-        public int CinematicSequenceId;
-        public int Alliance;
+        public uint CinematicSequenceId;
+        public uint Alliance;
         public Unused NameLang;
         public Unused NameFemaleLang;
         public Unused NameMaleLang;

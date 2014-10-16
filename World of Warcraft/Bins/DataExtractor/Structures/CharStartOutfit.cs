@@ -9,8 +9,8 @@ namespace ClientDBExtractor.Structures
         public byte ClassId;
         public byte SexId;
         public byte OutfitId;
-        public int[] ItemId = new int[24];
-        public int PetDisplayId;
-        public int PetFamilyId;
+        public uint[] ItemId = new uint[24];
+        public uint PetDisplayId;
+        public uint PetFamilyId;
     }
 }
