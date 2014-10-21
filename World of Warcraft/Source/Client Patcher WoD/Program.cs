@@ -46,10 +46,6 @@ namespace Connection_Patcher
                 var modulePattern     = Patterns.Windows.x64.Password;
                 var patchBNet         = Patches.Windows.x64.BNet;
                 var patternBNet       = Patterns.Windows.x64.BNet;
-                var patchPortal       = Patches.Windows.x64.Portal;
-                var patternPortal     = Patterns.Windows.x64.Portal;
-                var patchModulus      = Patches.Windows.x64.Modulus;
-                var patternModulus    = Patterns.Windows.x64.Modulus;
                 var patchConnect      = Patches.Windows.x64.Connect;
                 var patternConnect    = Patterns.Windows.x64.Connect;
                 var patchSignature    = Patches.Windows.x64.Signature;
@@ -67,8 +63,6 @@ namespace Connection_Patcher
                             Console.WriteLine("Win32 client...");
                             patchBNet        = Patches.Windows.x86.BNet;
                             patternBNet      = Patterns.Windows.x86.BNet;
-                            patchModulus     = Patches.Windows.x86.Modulus;
-                            patternModulus   = Patterns.Windows.x86.Modulus;
                             patchConnect     = Patches.Windows.x86.Connect;
                             patternConnect   = Patterns.Windows.x86.Connect;
                             patchSignature   = Patches.Windows.x86.Signature;
@@ -93,8 +87,6 @@ namespace Connection_Patcher
                             Console.WriteLine("Mac client...");
                             patchBNet        = Patches.Mac.x64.BNet;
                             patternBNet      = Patterns.Mac.x64.BNet;
-                            patchModulus     = Patches.Windows.x64.Modulus;
-                            patternModulus   = Patterns.Windows.x64.Modulus;
                             patchConnect     = Patterns.Windows.x64.Connect;
                             patternConnect   = Patterns.Windows.x64.Connect;
                             patchSignature   = Patches.Mac.x64.Signature;
@@ -111,10 +103,11 @@ namespace Connection_Patcher
                     }
 
                     patcher.Patch(patchBNet, patternBNet);
-                    patcher.Patch(patchPortal, patternPortal);
-                    patcher.Patch(patchModulus, patternModulus);
                     patcher.Patch(patchConnect, patternConnect);
                     patcher.Patch(patchSignature, patternSignature);
+
+                    patcher.Patch(Patches.Common.Portal, Patterns.Common.Portal);
+                    patcher.Patch(Patches.Common.Modulus, Patterns.Common.Modulus);
 
                     patcher.Binary = fileName;
 
