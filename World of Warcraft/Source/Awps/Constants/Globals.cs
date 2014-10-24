@@ -19,15 +19,7 @@ namespace Awps
 {
     class Globals
     {
-        // We'll use them in a future update
-        public static byte[] Send = { 0 };
-        public static byte[] Receive = { 0 };
-        
-        // { x86, x64 }
-        public static long[] ReceiveAddresses = { 0x397CEE, 0x5AAB60 };
-        public static long[] SendAddresses = { 0x399DF8, 0x5AE170 };
-
-        public static string Version = "AWPS 1.3 for WoW Build 18414";
-        public static string FullVersion = "5.4.8_18414";
+        public static string Version     = "AWPS 1.4 for WoW 6.x";
+        public static string FullVersion = "6.0.2_19034";
     }
 }

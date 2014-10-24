@@ -28,7 +28,7 @@ namespace Awps.Structures
 
         BinaryReader stream;
 
-        public Packet(CDataStore dataStore)
+        public Packet(CDataStore dataStore, bool other = false)
         {
             TimeStamp = Helper.GetUnixTime();
 
@@ -36,12 +36,40 @@ namespace Awps.Structures
 
             if (buffer != null)
             {
+                if (!other)
+                {
+                    stream = new BinaryReader(new MemoryStream(buffer));
+
+                    Message = stream.ReadUInt32();
+
+                    var size = (int)dataStore.Size - 4;
+
+                    Data = stream.ReadBytes(size);
+                }
+                else
+                {
+                    stream = new BinaryReader(new MemoryStream(buffer));
+
+                    var size = (int)dataStore.Size;
+
+                    Data = stream.ReadBytes(size);
+                }
+            }
+        }
+
+        public Packet(IntPtr bufferPtr, int size)
+        {
+            TimeStamp = Helper.GetUnixTime();
+
+            var buffer = Memory.Read(bufferPtr, size);
+
+            if (buffer != null)
+            {
                 stream = new BinaryReader(new MemoryStream(buffer));
+
                 Message = stream.ReadUInt32();
 
-                var size = (int)dataStore.Size - 4;
-
-                Data = stream.ReadBytes(size);
+                Data = stream.ReadBytes(size - 4);
             }
         }
 

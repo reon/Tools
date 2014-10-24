@@ -23,26 +23,38 @@ namespace Arctium_Injector
 {
     public class Functions : Native
     {
-        public static void Inject(Process p, string dll)
+        public static void Inject(Process process, string dll)
         {
-            if (p == null)
+            if (process == null)
                 throw new InvalidOperationException("Process doesn't exist.");
 
-            var procdessId = p.Id;
             var loadLibPtr = GetProcAddress(GetModuleHandle("kernel32.dll"), "LoadLibraryA");
-            var dllPathAsBytes = Encoding.ASCII.GetBytes(dll);
+            byte[] dllPathAsBytes = Encoding.ASCII.GetBytes(dll);
 
             if (loadLibPtr == IntPtr.Zero)
                 throw new InvalidOperationException("Can't get ptr for LoadLibraryA.");
 
-            IntPtr lpAddress = VirtualAllocEx(p.Handle, (IntPtr)null, (uint)dll.Length + 1, 0x1000, 0x40);
+            IntPtr lpAddress = VirtualAllocEx(process.Handle, (IntPtr)null, (uint)dll.Length + 1, MemCommit, PageExecuteReadWrite);
             
             if (lpAddress == IntPtr.Zero)
                 throw new InvalidOperationException("VirtualAllocEx failed.");
 
-            if (WriteProcessMemory(p.Handle, lpAddress, dllPathAsBytes, (uint)dllPathAsBytes.Length, 0) != 0)
-                if (CreateRemoteThread(p.Handle, IntPtr.Zero, 0, loadLibPtr, lpAddress, 0, IntPtr.Zero) == IntPtr.Zero)
+            if (WriteProcessMemory(process.Handle, lpAddress, dllPathAsBytes, (uint)dllPathAsBytes.Length, 0) != 0)
+                if (CreateRemoteThread(process.Handle, IntPtr.Zero, 0, loadLibPtr, lpAddress, 0, IntPtr.Zero) == IntPtr.Zero)
                     throw new InvalidOperationException("creating remote thread failed.");
+        }
+
+        public static bool IsProcessAlreadyInjected(Process process, string moduleName)
+        {
+            ProcessModuleCollection theModules = process.Modules;
+            foreach (ProcessModule module in theModules)
+            {
+                if (module.FileName.Contains(moduleName))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

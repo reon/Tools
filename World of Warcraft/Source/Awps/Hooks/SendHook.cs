@@ -40,62 +40,64 @@ namespace Awps
 
         public SendHook()
         {
-            long address;
+            long address = Helper.GetSendHookOffet();
 
-            if (Environment.Is64BitProcess)
+            if (address == 0)
             {
-                instructionLength = 12;
-
-                originalInstruction = new byte[instructionLength];
-                hookInstruction = new byte[instructionLength];
-
-                address = Globals.SendAddresses[1];
-
-                hookInstruction[0] = 0x48;
-                hookInstruction[1] = 0xB8;
-                hookInstruction[10] = 0xFF;
-                hookInstruction[11] = 0xE0;
+                Console.WriteLine("Can't find Send address!");
             }
             else
             {
-                instructionLength = 5;
+                if (Environment.Is64BitProcess)
+                {
+                    instructionLength = 12;
 
-                originalInstruction = new byte[instructionLength];
-                hookInstruction = new byte[instructionLength];
+                    originalInstruction = new byte[instructionLength];
+                    hookInstruction     = new byte[instructionLength];
 
-                address = Globals.SendAddresses[0];
+                    hookInstruction[0]  = 0x48;
+                    hookInstruction[1]  = 0xB8;
+                    hookInstruction[10] = 0xFF;
+                    hookInstruction[11] = 0xE0;
+                }
+                else
+                {
+                    instructionLength = 5;
 
-                hookInstruction[0] = 0xE9;
+                    originalInstruction = new byte[instructionLength];
+                    hookInstruction     = new byte[instructionLength];
+
+                    hookInstruction[0] = 0xE9;
+                }
+
+                Console.Write("Initialize Send hook at 0x{0:X8}... ", address);
+
+                // Assign function pointers
+                originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientSendDummy)) as ClientSendDummy;
+                originalFunction = Marshal.GetFunctionPointerForDelegate(originalDelegate);
+                hookFunction     = Marshal.GetFunctionPointerForDelegate(hookDelegate);
+
+                // Store original & hook instructions
+                Buffer.BlockCopy(Memory.Read(originalFunction, instructionLength), 0, originalInstruction, 0, instructionLength);
+            
+                if (Environment.Is64BitProcess)
+                    Buffer.BlockCopy(BitConverter.GetBytes(hookFunction.ToInt64()), 0, hookInstruction, 2, 8);
+                else
+                {
+                    var hookOffset = hookFunction.ToInt64() - (originalFunction.ToInt64() + instructionLength);
+
+                    Buffer.BlockCopy(BitConverter.GetBytes((uint)hookOffset), 0, hookInstruction, 1, 4);
+                }
+
+                Memory.Write(originalFunction, hookInstruction);
+
+                Console.WriteLine("Send hook successfully initialized!");
             }
-
-            originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientSendDummy)) as ClientSendDummy;
-
-            Console.WriteLine("Initialize Send hook...");
-
-            // Assign function pointers
-            originalFunction = Marshal.GetFunctionPointerForDelegate(originalDelegate);
-            hookFunction = Marshal.GetFunctionPointerForDelegate(hookDelegate);
-
-            // Store original & hook instructions
-            Buffer.BlockCopy(Memory.Read(originalFunction, instructionLength), 0, originalInstruction, 0, instructionLength);
-
-            if (Environment.Is64BitProcess)
-                Buffer.BlockCopy(BitConverter.GetBytes(hookFunction.ToInt64()), 0, hookInstruction, 2, 8);
-            else
-            {
-                var hookOffset = hookFunction.ToInt64() - (originalFunction.ToInt64() + instructionLength);
-
-                Buffer.BlockCopy(BitConverter.GetBytes((uint)hookOffset), 0, hookInstruction, 1, 4);
-            }
-
-            Memory.Write(originalFunction, hookInstruction);
-
-            Console.WriteLine("Send hook successfully initialized");
         }
 
         public static uint ClientSend(IntPtr ptr, ref CDataStore dataStore, int args)
         {
-            var ds = dataStore.Clone();
+            var ds  = dataStore.Clone();
             var pkt = new Packet(ds);
 
             PacketLog.Write(pkt, "ClientMessage");

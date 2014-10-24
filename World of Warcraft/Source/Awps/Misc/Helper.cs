@@ -16,7 +16,9 @@
  */
 
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using Awps.Misc;
 using Microsoft.Win32.SafeHandles;
@@ -29,9 +31,9 @@ namespace Awps
         {
             NativeMethods.AllocConsole();
 
-            var stdHandle = NativeMethods.GetStdHandle(-11);
+            var stdHandle      = NativeMethods.GetStdHandle(-11);
             var safeFileHandle = new SafeFileHandle(stdHandle, true);
-            var fileStream = new FileStream(safeFileHandle, FileAccess.Write);
+            var fileStream     = new FileStream(safeFileHandle, FileAccess.Write);
             var standardOutput = new StreamWriter(fileStream, Encoding.UTF8);
 
             standardOutput.AutoFlush = true;
@@ -42,7 +44,7 @@ namespace Awps
         public static uint GetUnixTime()
         {
             var baseDate = new DateTime(1970, 1, 1);
-            var ts = DateTime.Now - baseDate;
+            var ts       = DateTime.Now - baseDate;
 
             return (uint)ts.TotalSeconds;
         }
@@ -54,8 +56,48 @@ namespace Awps
             return baseDate.ToString(format);
         }
 
+        public static BinaryTypes GetBinaryType(byte[] data)
+        {
+            BinaryTypes type = 0u;
+
+            using (var reader = new BinaryReader(new MemoryStream(data)))
+            {
+                var magic = (uint)reader.ReadUInt16();
+
+                // Check MS-DOS magic
+                if (magic == 0x5A4D)
+                {
+                    reader.BaseStream.Seek(0x3C, SeekOrigin.Begin);
+
+                    // Read PE start offset
+                    var peOffset = reader.ReadUInt32();
+
+                    reader.BaseStream.Seek(peOffset, SeekOrigin.Begin);
+
+                    var peMagic = reader.ReadUInt32();
+
+                    // Check PE magic
+                    if (peMagic != 0x4550)
+                        throw new NotSupportedException("Not a PE file!");
+
+                    type = (BinaryTypes)reader.ReadUInt16();
+                }
+                else
+                {
+                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
+
+                    type = (BinaryTypes)reader.ReadUInt32();
+                }
+            }
+
+            return type;
+        }
+
         public static long SearchOffset(byte[] binary, byte[] pattern)
         {
+            if (pattern.Length == 0)
+                return 0;
+
             var matches = 0;
 
             for (long i = 0; i < binary.Length; i++)
@@ -84,6 +126,119 @@ namespace Awps
             }
 
             return 0;
+        }
+
+        // Format: {expansion}.{patch}.{subpatch}.{build} -> field value: {3}.{2}.{1}.{any other}
+        public static int GetVersionValueFromClient(byte field = 0)
+        {
+            Process process = Process.GetCurrentProcess();
+            string filename = process.Modules[0].FileName;
+            var versInfo    = FileVersionInfo.GetVersionInfo(filename);
+
+            int value;
+
+            switch (field)
+	        {
+		        case 1 : // SubPatch
+                    value = versInfo.FileBuildPart;
+		        break;
+		        case 2 : // Patch value
+                    value = versInfo.FileMinorPart;
+		        break;
+		        case 3 : // Expansion value
+                    value = versInfo.FileMajorPart;
+		        break;
+		        default: // buildNumber value
+                    value = versInfo.FilePrivatePart;
+		        break;
+	        }
+	
+            return value;
+        }
+
+        public static long GetPatternInProgram(byte[] pattern)
+        {
+            Process process = Process.GetCurrentProcess();
+
+            string filename = process.MainModule.FileName;
+            long offset = 0;
+
+            using (var stream = new MemoryStream(File.ReadAllBytes(filename)))
+            {
+                byte[] binary = stream.ToArray();
+
+                if (binary != null)
+                {
+                    offset = SearchOffset(binary, pattern);
+                }
+            }
+
+            if (offset != 0)
+                offset = offset + 0x0C00; // get rid of file header
+
+            return offset;
+        }
+        
+        public static long GetSendHookOffet()
+        {
+            var expansion  = GetVersionValueFromClient(3);
+            var build      = GetVersionValueFromClient(0);
+
+            long sendOffset = 0;
+
+            if (!Environment.Is64BitProcess)
+            {
+                if (expansion == 6)
+                {
+                    if (build > 19032)
+                    {
+                        sendOffset = GetPatternInProgram(Patterns.x86.patternSend601);
+                    }
+                }
+            }
+            else
+            {
+                if (expansion == 6)
+                {
+                    if (build > 19032)
+                    {
+                        sendOffset = GetPatternInProgram(Patterns.x64.patternSend601);
+                    }
+                }
+            }
+
+            return sendOffset;
+        }
+        
+        public static long GetReceiveHookOffet()
+        {
+            var expansion  = GetVersionValueFromClient(3);
+            var build      = GetVersionValueFromClient(0);
+
+            long receiveOffset = 0;
+
+            if (!Environment.Is64BitProcess)
+            {
+                if (expansion == 6)
+                {
+                    if (build > 19032)
+                    {
+                        receiveOffset = GetPatternInProgram(Patterns.x86.patternReceive19034);
+                    }
+                }
+            }
+            else
+            {
+                if (expansion == 6)
+                {
+                    if (build > 19032)
+                    {
+                        receiveOffset = GetPatternInProgram(Patterns.x64.patternReceive19034);
+                    }
+                }
+            }
+
+            return receiveOffset;
         }
     }
 }
