@@ -52,10 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Awps.cs" />
-    <Compile Include="Constants\ClientTypes.cs" />
     <Compile Include="Hooks\SendHook.cs" />
     <Compile Include="Log\PacketLog.cs" />
-    <Compile Include="Constants\BinaryTypes.cs" />
     <Compile Include="Constants\Globals.cs" />
     <Compile Include="Misc\Helper.cs" />
     <Compile Include="Hooks\ReceiveHook.cs" />

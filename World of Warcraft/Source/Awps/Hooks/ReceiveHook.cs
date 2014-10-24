@@ -26,12 +26,9 @@ namespace Awps
     {
         [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
         delegate uint ClientReceiveDummy(IntPtr ptr, IntPtr arg, IntPtr arg2, IntPtr dataPtr);
-        delegate uint ClientReceiveDummyx64(IntPtr ptr, IntPtr arg, IntPtr arg2, IntPtr dataPtr);
 
-        static ClientReceiveDummy    originalDelegate;
-        static ClientReceiveDummyx64 originalDelegatex64;
-        static ClientReceiveDummy    hookDelegate    = new ClientReceiveDummy(ClientReceive);
-        static ClientReceiveDummyx64 hookDelegatex64 = new ClientReceiveDummyx64(ClientReceivex64);
+        static ClientReceiveDummy originalDelegate;
+        static ClientReceiveDummy hookDelegate = new ClientReceiveDummy(ClientReceive);
 
         static IntPtr originalFunction;
         static IntPtr hookFunction;
@@ -43,7 +40,7 @@ namespace Awps
 
         public ReceiveHook()
         {
-            long address = Helper.GetReceiveHookOffet();
+            var address = Helper.GetReceiveHookOffet();
 
             if (address == 0)
             {
@@ -76,18 +73,9 @@ namespace Awps
                 Console.Write("Initialize Receive hook at 0x{0:X8}... ", address);
 
                 // Assign function pointers
-                if (Environment.Is64BitProcess)
-                {
-                    originalDelegatex64 = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientReceiveDummyx64)) as ClientReceiveDummyx64;
-                    originalFunction    = Marshal.GetFunctionPointerForDelegate(originalDelegatex64);
-                    hookFunction        = Marshal.GetFunctionPointerForDelegate(hookDelegatex64);
-                }
-                else
-                {
-                    originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientReceiveDummy)) as ClientReceiveDummy;
-                    originalFunction = Marshal.GetFunctionPointerForDelegate(originalDelegate);
-                    hookFunction     = Marshal.GetFunctionPointerForDelegate(hookDelegate);
-                }
+                originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientReceiveDummy)) as ClientReceiveDummy;
+                originalFunction = Marshal.GetFunctionPointerForDelegate(originalDelegate);
+                hookFunction = Marshal.GetFunctionPointerForDelegate(hookDelegate);
 
                 // Store original & hook instructions
                 Buffer.BlockCopy(Memory.Read(originalFunction, instructionLength), 0, originalInstruction, 0, instructionLength);
@@ -109,37 +97,16 @@ namespace Awps
 
         public static uint ClientReceive(IntPtr ptr, IntPtr arg, IntPtr arg2, IntPtr dataPtr)
         {
-            var size = BitConverter.ToUInt32(Memory.Read(dataPtr + 8, 4), 0);
+            var size = BitConverter.ToUInt32(Memory.Read(dataPtr + (IntPtr.Size << 1), 4), 0);
 
-            var bufferPtr = BitConverter.ToUInt32(Memory.Read(dataPtr, 4), 0);
-
-            var pkt = new Packet((IntPtr)bufferPtr, (int)size);
+            var bufferPtr = Memory.Read(dataPtr);
+            var pkt = new Packet(bufferPtr, (int)size);
 
             PacketLog.Write(pkt, "ServerMessage");
 
             Memory.Write(originalFunction, originalInstruction);
 
             var ret = (uint)originalDelegate.DynamicInvoke(new object[] { ptr, arg, arg2, dataPtr });
-
-            Memory.Write(originalFunction, hookInstruction);
-
-            return ret;
-        }
-
-
-        public static uint ClientReceivex64(IntPtr ptr, IntPtr arg, IntPtr arg2, IntPtr dataPtr)
-        {
-            var size = BitConverter.ToUInt32(Memory.Read(dataPtr + 16, 4), 0);
-
-            var bufferPtr = BitConverter.ToUInt64(Memory.Read(dataPtr, 8), 0);
-
-            var pkt = new Packet((IntPtr)bufferPtr, (int)size);
-
-            PacketLog.Write(pkt, "ServerMessage");
-
-            Memory.Write(originalFunction, originalInstruction);
-
-            var ret = (uint)originalDelegatex64.DynamicInvoke(new object[] { ptr, arg, arg2, dataPtr });
 
             Memory.Write(originalFunction, hookInstruction);
 

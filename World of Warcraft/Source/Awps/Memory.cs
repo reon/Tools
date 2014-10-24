@@ -47,6 +47,27 @@ namespace Awps
             IsInitialized = true;
         }
 
+        public static IntPtr Read(IntPtr address)
+        {
+            try
+            {
+                var size = IntPtr.Size;
+                var buffer = new byte[size];
+
+                NativeMethods.ReadProcessMemory(currentHandle, address, buffer, size);
+
+                return (IntPtr)(size == 4 ? BitConverter.ToInt32(buffer, 0) : BitConverter.ToInt64(buffer, 0));
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.InnerException);
+            }
+
+            return IntPtr.Zero;
+        }
+
         public static byte[] Read(IntPtr address, int size)
         {
             try

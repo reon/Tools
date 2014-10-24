@@ -40,7 +40,7 @@ namespace Awps
 
         public SendHook()
         {
-            long address = Helper.GetSendHookOffet();
+            var address = Helper.GetSendHookOffet();
 
             if (address == 0)
             {

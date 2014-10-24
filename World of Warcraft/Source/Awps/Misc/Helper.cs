@@ -18,7 +18,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using Awps.Misc;
 using Microsoft.Win32.SafeHandles;
@@ -54,43 +53,6 @@ namespace Awps
             var baseDate = DateTime.Now;
 
             return baseDate.ToString(format);
-        }
-
-        public static BinaryTypes GetBinaryType(byte[] data)
-        {
-            BinaryTypes type = 0u;
-
-            using (var reader = new BinaryReader(new MemoryStream(data)))
-            {
-                var magic = (uint)reader.ReadUInt16();
-
-                // Check MS-DOS magic
-                if (magic == 0x5A4D)
-                {
-                    reader.BaseStream.Seek(0x3C, SeekOrigin.Begin);
-
-                    // Read PE start offset
-                    var peOffset = reader.ReadUInt32();
-
-                    reader.BaseStream.Seek(peOffset, SeekOrigin.Begin);
-
-                    var peMagic = reader.ReadUInt32();
-
-                    // Check PE magic
-                    if (peMagic != 0x4550)
-                        throw new NotSupportedException("Not a PE file!");
-
-                    type = (BinaryTypes)reader.ReadUInt16();
-                }
-                else
-                {
-                    reader.BaseStream.Seek(0, SeekOrigin.Begin);
-
-                    type = (BinaryTypes)reader.ReadUInt32();
-                }
-            }
-
-            return type;
         }
 
         public static long SearchOffset(byte[] binary, byte[] pattern)
@@ -131,26 +93,25 @@ namespace Awps
         // Format: {expansion}.{patch}.{subpatch}.{build} -> field value: {3}.{2}.{1}.{any other}
         public static int GetVersionValueFromClient(byte field = 0)
         {
-            Process process = Process.GetCurrentProcess();
-            string filename = process.Modules[0].FileName;
-            var versInfo    = FileVersionInfo.GetVersionInfo(filename);
+            var process = Process.GetCurrentProcess();
+            var versInfo = FileVersionInfo.GetVersionInfo(process.Modules[0].FileName);
 
-            int value;
+            var value = 0;
 
             switch (field)
 	        {
 		        case 1 : // SubPatch
                     value = versInfo.FileBuildPart;
-		        break;
+                    break;
 		        case 2 : // Patch value
                     value = versInfo.FileMinorPart;
-		        break;
+                    break;
 		        case 3 : // Expansion value
                     value = versInfo.FileMajorPart;
-		        break;
+                    break;
 		        default: // buildNumber value
                     value = versInfo.FilePrivatePart;
-		        break;
+                    break;
 	        }
 	
             return value;
@@ -158,87 +119,36 @@ namespace Awps
 
         public static long GetPatternInProgram(byte[] pattern)
         {
-            Process process = Process.GetCurrentProcess();
+            var process = Process.GetCurrentProcess();
+            var binary = File.ReadAllBytes(process.MainModule.FileName);
+            var offset = 0L;
 
-            string filename = process.MainModule.FileName;
-            long offset = 0;
-
-            using (var stream = new MemoryStream(File.ReadAllBytes(filename)))
+            if (binary != null)
             {
-                byte[] binary = stream.ToArray();
+                offset = SearchOffset(binary, pattern);
 
-                if (binary != null)
-                {
-                    offset = SearchOffset(binary, pattern);
-                }
+                // get rid of file header
+                if (offset != 0)
+                    offset += 0x0C00;
             }
-
-            if (offset != 0)
-                offset = offset + 0x0C00; // get rid of file header
 
             return offset;
         }
         
         public static long GetSendHookOffet()
         {
-            var expansion  = GetVersionValueFromClient(3);
-            var build      = GetVersionValueFromClient(0);
-
-            long sendOffset = 0;
-
-            if (!Environment.Is64BitProcess)
-            {
-                if (expansion == 6)
-                {
-                    if (build > 19032)
-                    {
-                        sendOffset = GetPatternInProgram(Patterns.x86.patternSend601);
-                    }
-                }
-            }
+            if (Environment.Is64BitProcess)
+                return GetPatternInProgram(Patterns.x64.Send);
             else
-            {
-                if (expansion == 6)
-                {
-                    if (build > 19032)
-                    {
-                        sendOffset = GetPatternInProgram(Patterns.x64.patternSend601);
-                    }
-                }
-            }
-
-            return sendOffset;
+                return GetPatternInProgram(Patterns.x86.Send);
         }
-        
+
         public static long GetReceiveHookOffet()
         {
-            var expansion  = GetVersionValueFromClient(3);
-            var build      = GetVersionValueFromClient(0);
-
-            long receiveOffset = 0;
-
-            if (!Environment.Is64BitProcess)
-            {
-                if (expansion == 6)
-                {
-                    if (build > 19032)
-                    {
-                        receiveOffset = GetPatternInProgram(Patterns.x86.patternReceive19034);
-                    }
-                }
-            }
+            if (Environment.Is64BitProcess)
+                return GetPatternInProgram(Patterns.x64.Receive);
             else
-            {
-                if (expansion == 6)
-                {
-                    if (build > 19032)
-                    {
-                        receiveOffset = GetPatternInProgram(Patterns.x64.patternReceive19034);
-                    }
-                }
-            }
-
-            return receiveOffset;
+                return GetPatternInProgram(Patterns.x86.Receive);
         }
     }
 }
