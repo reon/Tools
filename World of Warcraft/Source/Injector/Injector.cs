@@ -35,11 +35,13 @@ namespace Arctium_Injector
 
             if (args.Length == 2)
                 dll = args[1];
+
             var waiting = true;
 
             while (waiting)
             {
                 var processList = Process.GetProcessesByName(processName);
+
                 if (processList.Length > 1)
                 {
                     // Several process... Show menu and wait for valid entry
@@ -53,14 +55,11 @@ namespace Arctium_Injector
                     for (var i = 0; i < process; i++)
                     {
                         if (Functions.IsProcessAlreadyInjected(processList[i], dll))
-                        {
                             Console.WriteLine("[!][injected] ({0})", processList[i].MainWindowTitle);
-                        }
                         else
-                        {
                             Console.WriteLine("[?][{0}] - {1} ({2})", i + 1, processList[i].Id, processList[i].MainWindowTitle);
-                        }
                     }
+
                     Console.WriteLine("[?][0] - Exit");
 
                     while (looping)
@@ -89,26 +88,21 @@ namespace Arctium_Injector
                         catch(Exception exception)
                         {
                             looping = false;
-                            throw new NotSupportedException(exception.Message);
+
+                            Console.WriteLine(exception.Message);
                         }
                     }
 
                     if (validProcess)
-                    {
                         Functions.Inject(processList[selectedProcess - 1], dll);
-                    }
                 }
                 else if (processList.Length == 1)
                 {
                     // Only one process was found
                     if (Functions.IsProcessAlreadyInjected(processList[0], dll))
-                    {
                         Console.WriteLine("Process already injected!");
-                    }
                     else
-                    {
                         Functions.Inject(processList[0], dll);
-                    }
                 }
                 else
                 {
