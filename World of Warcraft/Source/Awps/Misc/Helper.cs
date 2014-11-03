@@ -117,6 +117,16 @@ namespace Awps
             return value;
         }
 
+        public static string GetClientBuildVersion()
+        {
+            return string.Format("{0}.{1}.{2}_{3}", 
+                GetVersionValueFromClient(3), 
+                GetVersionValueFromClient(2), 
+                GetVersionValueFromClient(1), 
+                GetVersionValueFromClient(0)
+                );
+        }
+
         public static long GetPatternInProgram(byte[] pattern)
         {
             var process = Process.GetCurrentProcess();

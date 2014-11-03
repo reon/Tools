@@ -34,7 +34,7 @@ namespace Awps.Log
 
         public void SetLogFile(string directory, string name)
         {
-            LogFile = string.Format("{0}/{1}_{2} - {3}.awps", directory, Globals.FullVersion, Helper.GetCustomTimeFormat("MMMM-dd-HHmm"), name);
+            LogFile = string.Format("{0}/{1}_{2} - {3}.awps", directory, Helper.GetClientBuildVersion(), Helper.GetCustomTimeFormat("MMMM-dd-HHmm"), name);
 
             logStream = new FileStream(LogFile, FileMode.Append, FileAccess.Write, FileShare.ReadWrite, 4096, true);
         }

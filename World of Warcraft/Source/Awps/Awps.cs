@@ -44,10 +44,7 @@ namespace Awps
                 Console.WriteLine("___________________________________________");
                 Console.WriteLine("http://arctium.org\n");
                 Console.Write("{0} ", Globals.Version);
-                Console.WriteLine("(client detected: {0}.{1}.{2}.{3} {4})\n", Helper.GetVersionValueFromClient(3),
-                    Helper.GetVersionValueFromClient(2),
-                    Helper.GetVersionValueFromClient(1),
-                    Helper.GetVersionValueFromClient(0),
+                Console.WriteLine("(client detected: {0} {1})\n", Helper.GetClientBuildVersion(),
                     ((Environment.Is64BitProcess) ? "x64" : "x86"));
                 Console.WriteLine("Please enter a command.");
                 Console.WriteLine("Available commands are: 'start'\n");
