@@ -24,8 +24,8 @@ namespace Awps
 {
     class ReceiveHook
     {
-        [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-        delegate uint ClientReceiveDummy(IntPtr ptr, IntPtr arg, IntPtr arg2, IntPtr dataPtr);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        delegate uint ClientReceiveDummy(IntPtr netMessage, IntPtr arg2, IntPtr arg3, IntPtr dataPtr, UIntPtr length);
 
         static ClientReceiveDummy originalDelegate;
         static ClientReceiveDummy hookDelegate = new ClientReceiveDummy(ClientReceive);
@@ -95,18 +95,15 @@ namespace Awps
             }
         }
 
-        public static uint ClientReceive(IntPtr ptr, IntPtr arg, IntPtr arg2, IntPtr dataPtr)
+        public static uint ClientReceive(IntPtr netMessage, IntPtr arg2, IntPtr arg3, IntPtr dataPtr, UIntPtr length)
         {
-            var size = BitConverter.ToUInt32(Memory.Read(dataPtr + (IntPtr.Size << 1), 4), 0);
-
-            var bufferPtr = Memory.Read(dataPtr);
-            var pkt = new Packet(bufferPtr, (int)size);
+            var pkt = new Packet(dataPtr, (int)(length.ToUInt64() & 0xFFFFFFFF));
 
             PacketLog.Write(pkt, "ServerMessage");
 
             Memory.Write(originalFunction, originalInstruction);
 
-            var ret = (uint)originalDelegate.DynamicInvoke(new object[] { ptr, arg, arg2, dataPtr });
+            var ret = (uint)originalDelegate.DynamicInvoke(new object[] { netMessage, arg2, arg3, dataPtr, length });
 
             Memory.Write(originalFunction, hookInstruction);
 
