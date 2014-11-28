@@ -19,6 +19,6 @@ namespace Awps
 {
     class Globals
     {
-        public static string Version     = "AWPS 1.4 for WoW 6.x";
+        public static string Version     = "AWPS 1.5 for WoW 6.x";
     }
 }
