@@ -24,7 +24,7 @@ namespace Awps.Hooks
     public class BNetSendHook
     {
         [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-        delegate uint ClientSendDummy(IntPtr ptr, IntPtr dataPtr, int dataSize);
+        delegate uint ClientSendDummy(IntPtr ptr, IntPtr dataPtr, IntPtr dataSize);
 
         static ClientSendDummy originalDelegate;
         static ClientSendDummy hookDelegate = new ClientSendDummy(ClientSend);
@@ -39,7 +39,7 @@ namespace Awps.Hooks
 
         public BNetSendHook()
         {
-            var address = 0x7259F6;
+            var address = Helper.GetBNetSendHookOffet();
 
             if (address == 0)
             {
@@ -49,9 +49,7 @@ namespace Awps.Hooks
             {
                 if (Environment.Is64BitProcess)
                 {
-                    return;
-
-                    /*instructionLength = 12;
+                    instructionLength = 12;
 
                     originalInstruction = new byte[instructionLength];
                     hookInstruction     = new byte[instructionLength];
@@ -59,7 +57,7 @@ namespace Awps.Hooks
                     hookInstruction[0]  = 0x48;
                     hookInstruction[1]  = 0xB8;
                     hookInstruction[10] = 0xFF;
-                    hookInstruction[11] = 0xE0;*/
+                    hookInstruction[11] = 0xE0;
                 }
                 else
                 {
@@ -96,10 +94,11 @@ namespace Awps.Hooks
             }
         }
 
-        public static uint ClientSend(IntPtr ptr, IntPtr dataPtr, int dataSize)
+        public static uint ClientSend(IntPtr ptr, IntPtr dataPtr, IntPtr dataSize)
         {
-            var buffer = Memory.Read(dataPtr, dataSize);
-            var pkt = new BNetPacket(buffer, dataSize);
+            var size = dataSize.ToInt32();
+            var buffer = Memory.Read(dataPtr, size);
+            var pkt = new BNetPacket(buffer, size);
 
             Awps.bnetLogger.Write(pkt, "Client");
 

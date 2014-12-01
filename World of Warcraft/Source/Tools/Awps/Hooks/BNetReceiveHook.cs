@@ -39,7 +39,7 @@ namespace Awps.Hooks
 
         public BNetReceiveHook()
         {
-            var address = 0x56A241;
+            var address = Helper.GetBNetReceiveHookOffet();
 
             if (address == 0)
             {
@@ -49,9 +49,6 @@ namespace Awps.Hooks
             {
                 if (Environment.Is64BitProcess)
                 {
-                    return;
-
-                    /*
                     instructionLength = 12;
 
                     originalInstruction = new byte[instructionLength];
@@ -60,7 +57,7 @@ namespace Awps.Hooks
                     hookInstruction[0] = 0x48;
                     hookInstruction[1] = 0xB8;
                     hookInstruction[10] = 0xFF;
-                    hookInstruction[11] = 0xE0;*/
+                    hookInstruction[11] = 0xE0;
                 }
                 else
                 {
@@ -99,7 +96,7 @@ namespace Awps.Hooks
 
         public static uint ClientReceive(IntPtr ptr, IntPtr arg2, IntPtr arg3, IntPtr packetPtr)
         {
-            var pktSize = BitConverter.ToInt32(Memory.Read(packetPtr + 8, 4), 0);
+            var pktSize = BitConverter.ToInt32(Memory.Read(packetPtr + (IntPtr.Size << 1), 4), 0);
             var pktBufPtr = Memory.Read(packetPtr);
             var buffer = Memory.Read(pktBufPtr, pktSize);
             var pkt = new BNetPacket(buffer, pktSize);

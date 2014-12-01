@@ -144,7 +144,23 @@ namespace Awps
 
             return offset;
         }
-        
+
+        public static long GetBNetSendHookOffet()
+        {
+            if (Environment.Is64BitProcess)
+                return GetPatternInProgram(Patterns.x64.BNetSend);
+            else
+                return GetPatternInProgram(Patterns.x86.BNetSend);
+        }
+
+        public static long GetBNetReceiveHookOffet()
+        {
+            if (Environment.Is64BitProcess)
+                return GetPatternInProgram(Patterns.x64.BNetReceive);
+            else
+                return GetPatternInProgram(Patterns.x86.BNetReceive);
+        }
+
         public static long GetSendHookOffet()
         {
             if (Environment.Is64BitProcess)
