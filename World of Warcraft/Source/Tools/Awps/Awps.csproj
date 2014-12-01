@@ -52,6 +52,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Awps.cs" />
+    <Compile Include="Hooks\BNetReceiveHook.cs" />
+    <Compile Include="Hooks\BNetSendHook.cs" />
     <Compile Include="Hooks\SendHook.cs" />
     <Compile Include="Log\PacketLog.cs" />
     <Compile Include="Constants\Globals.cs" />
@@ -62,6 +64,7 @@
     <Compile Include="Misc\NativeMethods.cs" />
     <Compile Include="Constants\Patterns.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structures\BNetPacket.cs" />
     <Compile Include="Structures\CDataStore.cs" />
     <Compile Include="Structures\Packet.cs" />
   </ItemGroup>

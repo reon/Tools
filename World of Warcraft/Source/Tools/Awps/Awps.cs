@@ -18,12 +18,18 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using Awps.Hooks;
 using Awps.Log;
 
 namespace Awps
 {
     public class Awps
     {
+        public static PacketLog bnetLogger;
+        public static PacketLog wowLogger;
+
+        static BNetReceiveHook bnetReceive;
+        static BNetSendHook bnetSend;
         static ReceiveHook receive;
         static SendHook send;
 
@@ -66,20 +72,41 @@ namespace Awps
                 var name = "";
 
                 if (command.ToLower() != "start")
+                {
                     if (command.ToLower().StartsWith("start"))
                     {
                         name = command.Substring(6).Replace(@"""", "");
                         command = "start";
                     }
+                }
 
                 switch (command.ToLower())
                 {
                     case "start":
-                        PacketLog.Initialize("PacketDumps", name != "" ? name : "Dump");
+                        bnetLogger = new PacketLog();
+                        bnetLogger.Initialize("PacketDumps", name != "" ? name : "BNetDump");
+
+                        wowLogger = new PacketLog();
+                        wowLogger.Initialize("PacketDumps", name != "" ? name : "WoWDump");
 
                         Console.WriteLine("Starting Arctium WoW Packet Sniffer...");
 
-                        if (!PacketLog.IsRunning)
+                        if (!bnetLogger.IsRunning)
+                        {
+                            if (bnetReceive == null)
+                                bnetReceive = new BNetReceiveHook();
+                            else
+                                bnetReceive.Start();
+
+                            if (bnetSend == null)
+                                bnetSend = new BNetSendHook();
+                            else
+                                bnetSend.Start();
+
+                            bnetLogger.IsRunning = true;
+                        }
+
+                        if (!wowLogger.IsRunning)
                         {
                             if (receive == null)
                                 receive = new ReceiveHook();
@@ -91,15 +118,18 @@ namespace Awps
                             else
                                 send.Start();
 
-                            PacketLog.IsRunning = true;
+                            wowLogger.IsRunning = true;
                         }
 
                         break;
                     case "stop":
+                        bnetReceive.Remove();
+                        bnetSend.Remove();
                         receive.Remove();
                         send.Remove();
 
-                        PacketLog.IsRunning = false;
+                        bnetLogger.IsRunning = false;
+                        wowLogger.IsRunning = false;
 
                         break;
                     default:

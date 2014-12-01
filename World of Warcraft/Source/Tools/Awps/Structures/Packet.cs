@@ -20,7 +20,7 @@ using System.IO;
 
 namespace Awps.Structures
 {
-    class Packet : IDisposable
+    public class Packet : IDisposable
     {
         public uint TimeStamp { get; set; }
         public uint Message { get; set; }

@@ -19,12 +19,12 @@ using System;
 using System.Runtime.InteropServices;
 using Awps.Structures;
 
-namespace Awps
+namespace Awps.Hooks
 {
-    class ReceiveHook
+    public class BNetReceiveHook
     {
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate uint ClientReceiveDummy(IntPtr netMessage, IntPtr arg2, IntPtr arg3, IntPtr dataPtr, UIntPtr length);
+        [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
+        delegate uint ClientReceiveDummy(IntPtr ptr, IntPtr arg2, IntPtr arg3, IntPtr packetPtr);
 
         static ClientReceiveDummy originalDelegate;
         static ClientReceiveDummy hookDelegate = new ClientReceiveDummy(ClientReceive);
@@ -37,9 +37,9 @@ namespace Awps
         static byte[] originalInstruction;
         static byte[] hookInstruction;
 
-        public ReceiveHook()
+        public BNetReceiveHook()
         {
-            var address = Helper.GetReceiveHookOffet();
+            var address = 0x56A241;
 
             if (address == 0)
             {
@@ -49,22 +49,25 @@ namespace Awps
             {
                 if (Environment.Is64BitProcess)
                 {
+                    return;
+
+                    /*
                     instructionLength = 12;
 
                     originalInstruction = new byte[instructionLength];
-                    hookInstruction     = new byte[instructionLength];
-                
-                    hookInstruction[0]  = 0x48;
-                    hookInstruction[1]  = 0xB8;
+                    hookInstruction = new byte[instructionLength];
+
+                    hookInstruction[0] = 0x48;
+                    hookInstruction[1] = 0xB8;
                     hookInstruction[10] = 0xFF;
-                    hookInstruction[11] = 0xE0;
+                    hookInstruction[11] = 0xE0;*/
                 }
                 else
                 {
                     instructionLength = 5;
 
                     originalInstruction = new byte[instructionLength];
-                    hookInstruction     = new byte[instructionLength];
+                    hookInstruction = new byte[instructionLength];
 
                     hookInstruction[0] = 0xE9;
                 }
@@ -94,15 +97,18 @@ namespace Awps
             }
         }
 
-        public static uint ClientReceive(IntPtr netMessage, IntPtr arg2, IntPtr arg3, IntPtr dataPtr, UIntPtr length)
+        public static uint ClientReceive(IntPtr ptr, IntPtr arg2, IntPtr arg3, IntPtr packetPtr)
         {
-            var pkt = new Packet(dataPtr, (int)(length.ToUInt64() & 0xFFFFFFFF));
+            var pktSize = BitConverter.ToInt32(Memory.Read(packetPtr + 8, 4), 0);
+            var pktBufPtr = Memory.Read(packetPtr);
+            var buffer = Memory.Read(pktBufPtr, pktSize);
+            var pkt = new BNetPacket(buffer, pktSize);
 
-            Awps.wowLogger.Write(pkt, "ServerMessage");
+            Awps.bnetLogger.Write(pkt, "Server");
 
             Memory.Write(originalFunction, originalInstruction);
 
-            var ret = (uint)originalDelegate.DynamicInvoke(new object[] { netMessage, arg2, arg3, dataPtr, length });
+            var ret = (uint)originalDelegate.DynamicInvoke(new object[] { ptr, arg2, arg3, packetPtr });
 
             Memory.Write(originalFunction, hookInstruction);
 

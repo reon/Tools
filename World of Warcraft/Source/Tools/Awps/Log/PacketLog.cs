@@ -24,15 +24,15 @@ using Awps.Structures;
 
 namespace Awps.Log
 {
-    class PacketLog
+    public class PacketLog
     {
-        public static bool IsLogTaskInitialized { get; set; }
-        public static bool IsRunning { get; set; }
+        public bool IsLogTaskInitialized { get; set; }
+        public bool IsRunning { get; set; }
 
-        static FileLog logger;
-        static BlockingCollection<string> logQueue = new BlockingCollection<string>();
+        FileLog logger;
+        BlockingCollection<string> logQueue = new BlockingCollection<string>();
 
-        public static async void Initialize(string directory, string name)
+        public async void Initialize(string directory, string name)
         {
             if (!IsRunning)
             {
@@ -50,7 +50,7 @@ namespace Awps.Log
                 if (logger == null)
                 {
                     logger = new FileLog(directory, name);
-                    PacketLog.StartLogTask();
+                    StartLogTask();
                 }
                 else
                 {
@@ -65,7 +65,7 @@ namespace Awps.Log
             }
         }
 
-        public static async void StartLogTask()
+        public async void StartLogTask()
         {
             if (!IsLogTaskInitialized)
             {
@@ -84,7 +84,26 @@ namespace Awps.Log
             }
         }
 
-        public static async void Write(Packet packet, string type)
+        public async void Write(BNetPacket packet, string type)
+        {
+            Func<Task> write = async delegate
+            {
+                var sb = new StringBuilder();
+
+                sb.Append(string.Format("Time: {0};MessageType: {1};HasChannel: {2};Channel: {3};MessageValue: {4};Packet: ", packet.TimeStamp, type, packet.HasChannel, packet.Channel, packet.Message));
+
+                foreach (var b in packet.Data)
+                    sb.Append(string.Format("{0:X2}", b));
+
+                sb.Append(";");
+
+                await Task.Run(new Action(delegate() { logQueue.Add(sb.ToString()); }));
+            };
+
+            await write();
+        }
+
+        public async void Write(Packet packet, string type)
         {
             Func<Task> write = async delegate
             {
@@ -97,7 +116,7 @@ namespace Awps.Log
 
                 sb.Append(";");
 
-                await Task.Run(new Action(delegate() { logQueue.Add(sb.ToString()); }));
+                await Task.Run(new Action(delegate () { logQueue.Add(sb.ToString()); }));
             };
 
             await write();

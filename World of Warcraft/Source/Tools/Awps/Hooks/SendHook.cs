@@ -17,7 +17,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Awps.Log;
 using Awps.Structures;
 
 namespace Awps
@@ -100,7 +99,7 @@ namespace Awps
             var ds  = dataStore.Clone();
             var pkt = new Packet(ds);
 
-            PacketLog.Write(pkt, "ClientMessage");
+            Awps.wowLogger.Write(pkt, "ClientMessage");
 
             Memory.Write(originalFunction, originalInstruction);
 

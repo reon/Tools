@@ -19,15 +19,15 @@ using System;
 using System.Runtime.InteropServices;
 using Awps.Structures;
 
-namespace Awps
+namespace Awps.Hooks
 {
-    class ReceiveHook
+    public class BNetSendHook
     {
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        delegate uint ClientReceiveDummy(IntPtr netMessage, IntPtr arg2, IntPtr arg3, IntPtr dataPtr, UIntPtr length);
+        [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
+        delegate uint ClientSendDummy(IntPtr ptr, IntPtr dataPtr, int dataSize);
 
-        static ClientReceiveDummy originalDelegate;
-        static ClientReceiveDummy hookDelegate = new ClientReceiveDummy(ClientReceive);
+        static ClientSendDummy originalDelegate;
+        static ClientSendDummy hookDelegate = new ClientSendDummy(ClientSend);
 
         static IntPtr originalFunction;
         static IntPtr hookFunction;
@@ -37,42 +37,44 @@ namespace Awps
         static byte[] originalInstruction;
         static byte[] hookInstruction;
 
-        public ReceiveHook()
+        public BNetSendHook()
         {
-            var address = Helper.GetReceiveHookOffet();
+            var address = 0x7259F6;
 
             if (address == 0)
             {
-                Console.WriteLine("Can't find Receive address!");
+                Console.WriteLine("Can't find Send address!");
             }
             else
             {
                 if (Environment.Is64BitProcess)
                 {
-                    instructionLength = 12;
+                    return;
+
+                    /*instructionLength = 12;
 
                     originalInstruction = new byte[instructionLength];
                     hookInstruction     = new byte[instructionLength];
-                
+
                     hookInstruction[0]  = 0x48;
                     hookInstruction[1]  = 0xB8;
                     hookInstruction[10] = 0xFF;
-                    hookInstruction[11] = 0xE0;
+                    hookInstruction[11] = 0xE0;*/
                 }
                 else
                 {
                     instructionLength = 5;
 
                     originalInstruction = new byte[instructionLength];
-                    hookInstruction     = new byte[instructionLength];
+                    hookInstruction = new byte[instructionLength];
 
                     hookInstruction[0] = 0xE9;
                 }
 
-                Console.Write("Initialize Receive hook at 0x{0:X8}... ", address);
+                Console.Write("Initialize Send hook at 0x{0:X8}... ", address);
 
                 // Assign function pointers
-                originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientReceiveDummy)) as ClientReceiveDummy;
+                originalDelegate = Marshal.GetDelegateForFunctionPointer(new IntPtr(address + Memory.BaseAddress), typeof(ClientSendDummy)) as ClientSendDummy;
                 originalFunction = Marshal.GetFunctionPointerForDelegate(originalDelegate);
                 hookFunction = Marshal.GetFunctionPointerForDelegate(hookDelegate);
 
@@ -90,23 +92,24 @@ namespace Awps
 
                 Memory.Write(originalFunction, hookInstruction);
 
-                Console.WriteLine("Receive hook successfully initialized!");
+                Console.WriteLine("Send hook successfully initialized!");
             }
         }
 
-        public static uint ClientReceive(IntPtr netMessage, IntPtr arg2, IntPtr arg3, IntPtr dataPtr, UIntPtr length)
+        public static uint ClientSend(IntPtr ptr, IntPtr dataPtr, int dataSize)
         {
-            var pkt = new Packet(dataPtr, (int)(length.ToUInt64() & 0xFFFFFFFF));
+            var buffer = Memory.Read(dataPtr, dataSize);
+            var pkt = new BNetPacket(buffer, dataSize);
 
-            Awps.wowLogger.Write(pkt, "ServerMessage");
+            Awps.bnetLogger.Write(pkt, "Client");
 
             Memory.Write(originalFunction, originalInstruction);
 
-            var ret = (uint)originalDelegate.DynamicInvoke(new object[] { netMessage, arg2, arg3, dataPtr, length });
+            var ret = (uint)originalDelegate.DynamicInvoke(new object[] { ptr, dataPtr, dataSize });
 
             Memory.Write(originalFunction, hookInstruction);
 
-            return ret;
+            return (uint)ret;
         }
 
         public void Start()
