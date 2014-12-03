@@ -73,9 +73,6 @@ namespace Awps.Commands
 
                 Awps.wowLogger.IsRunning = true;
             }
-
-            if (Environment.Is64BitProcess)
-                SendCDataStore.Initialize();
         }
 
         [ConsoleCommand("stop", "")]
@@ -88,6 +85,13 @@ namespace Awps.Commands
 
             Awps.bnetLogger.IsRunning = false;
             Awps.wowLogger.IsRunning = false;
+        }
+
+        [ConsoleCommand("send", "")]
+        public static void Send(string[] args)
+        {
+            if (Environment.Is64BitProcess)
+                SendCDataStore.Initialize();
         }
     }
 }

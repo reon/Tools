@@ -46,7 +46,7 @@ namespace Awps
 
             Console.WriteLine("CurrentConnection initialized.");
 
-            while (curConn == IntPtr.Zero)
+            while (vTable == IntPtr.Zero)
             {
                 Console.WriteLine("Waiting for `vtable for'CDataStore initialization.");
 
