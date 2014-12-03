@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Awps
+namespace Awps.Constants
 {
-    class Globals
+    public enum GuidSubType : byte
     {
-        public static string Version     = "AWPS 1.6 for WoW 6.x";
+        None = 0
     }
 }

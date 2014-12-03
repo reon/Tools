@@ -21,7 +21,7 @@ using Awps.Structures;
 
 namespace Awps
 {
-    class ReceiveHook
+    public class ReceiveHook
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate uint ClientReceiveDummy(IntPtr netMessage, IntPtr arg2, IntPtr arg3, IntPtr dataPtr, UIntPtr length);

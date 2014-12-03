@@ -21,7 +21,7 @@ using Awps.Structures;
 
 namespace Awps
 {
-    class SendHook
+    public class SendHook
     {
         [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
         delegate uint ClientSendDummy(IntPtr ptr, ref CDataStore dataStore, int args);

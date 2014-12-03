@@ -51,12 +51,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\ConsoleCommandAttribute.cs" />
     <Compile Include="Awps.cs" />
+    <Compile Include="Commands\CommandManager.cs" />
+    <Compile Include="Commands\HookCommands.cs" />
+    <Compile Include="Commands\Packets\CreatureQueryCommands.cs" />
+    <Compile Include="Constants\GuidSubType.cs" />
+    <Compile Include="Constants\GuidType.cs" />
     <Compile Include="Hooks\BNetReceiveHook.cs" />
     <Compile Include="Hooks\BNetSendHook.cs" />
     <Compile Include="Hooks\SendHook.cs" />
     <Compile Include="Log\PacketLog.cs" />
     <Compile Include="Constants\Globals.cs" />
+    <Compile Include="Misc\Command.cs" />
     <Compile Include="Misc\Helper.cs" />
     <Compile Include="Hooks\ReceiveHook.cs" />
     <Compile Include="Log\FileLog.cs" />
@@ -64,9 +71,12 @@
     <Compile Include="Misc\NativeMethods.cs" />
     <Compile Include="Constants\Patterns.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Hooks\SendCDataStore.cs" />
     <Compile Include="Structures\BNetPacket.cs" />
     <Compile Include="Structures\CDataStore.cs" />
     <Compile Include="Structures\Packet.cs" />
+    <Compile Include="Structures\PacketWriter.cs" />
+    <Compile Include="Structures\SmartGuid.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

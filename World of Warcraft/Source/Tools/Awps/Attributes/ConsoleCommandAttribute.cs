@@ -15,10 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Awps
+using System;
+
+namespace Awps.Attributes
 {
-    class Globals
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class ConsoleCommandAttribute : Attribute
     {
-        public static string Version     = "AWPS 1.6 for WoW 6.x";
+        public string Command { get; }
+        public string Description { get; }
+
+        public ConsoleCommandAttribute(string command, string description)
+        {
+            Command = command.ToLower();
+            Description = description;
+        }
     }
 }

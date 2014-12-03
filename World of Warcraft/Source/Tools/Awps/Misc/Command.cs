@@ -15,10 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Awps
+using System;
+
+namespace Awps.Misc
 {
-    class Globals
+    class Command
     {
-        public static string Version     = "AWPS 1.6 for WoW 6.x";
+        public static T Read<T>(string[] args, int index)
+        {
+            try
+            {
+                return (T)Convert.ChangeType(args[index], typeof(T));
+            }
+            catch
+            {
+                Console.WriteLine("Wrong arguments for the current command.");
+            }
+
+            return default(T);
+        }
     }
 }
