@@ -3,6 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using ClientDBExtractor.Reader;
@@ -99,8 +100,6 @@ namespace ClientDBExtractor
                 }
             }
 
-            Console.ReadKey();
-
             Directory.CreateDirectory("./Arctium/ClientDB/SQL");
             Directory.CreateDirectory("./Arctium/ClientDB/Files");
 
@@ -177,65 +176,92 @@ namespace ClientDBExtractor
             Console.WriteLine("Generating SQL data...");
             Console.WriteLine();
 
+            var generatedTables = new List<string>();
             var counter = 0;
+
+            var noLocaleMSSQL = new StreamWriter($"./Arctium/ClientDB/SQL/DataDB.MSSQL.sql");
+            var noLocaleMYSQL = new StreamWriter($"./Arctium/ClientDB/SQL/DataDB.MYSQL.sql");
 
             foreach (var locale in locales)
             {
-                using (var mssql = new StreamWriter($"./Arctium/ClientDB/SQL/{locale.Key}_DataDB.MSSQL.sql"))
+                var localeMSSQL = new StreamWriter($"./Arctium/ClientDB/SQL/{locale.Key}_DataDB.MSSQL.sql");
+                var localeMYSQL = new StreamWriter($"./Arctium/ClientDB/SQL/{locale.Key}_DataDB.MYSQL.sql");
+
+                foreach (var file in existingStructList)
                 {
-                    using (var mysql = new StreamWriter($"./Arctium/ClientDB/SQL/{locale.Key}_DataDB.MYSQL.sql"))
+                    var nameOnly = file.Replace(@"\\", "").Replace(@"DBFilesClient\", "");
+                    var dbStream = new MemoryStream(File.ReadAllBytes($"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly}"));
+
+                    if (dbStream != null)
                     {
-                        foreach (var file in existingStructList)
+                        nameOnly = nameOnly.Replace(@".dbc", "").Replace(@".db2", "");
+
+                        var ccp = new CSharpCodeProvider();
+                        var paramss = new CompilerParameters();
+
+                        paramss.GenerateExecutable = false;
+                        paramss.GenerateInMemory = true;
+
+                        paramss.ReferencedAssemblies.Add("ClientDBExtractor.exe");
+
+                        var file1 = File.ReadAllText(structsPath + nameOnly + ".cs");
+                        var code = new[] { file1 };
+
+                        var result = ccp.CompileAssemblyFromSource(paramss, code);
+                        var type = result.CompiledAssembly.GetTypes()[0];
+                        var hasStringProperties = type.GetProperties().Any(p => p.PropertyType == typeof(string));
+
+                        var pluralized = nameOnly.Replace(@".dbc", "").Replace(@".db2", "").Pluralize();
+
+                        if (hasStringProperties)
+                            pluralized = pluralized + "_" + locale.Key;
+
+                        if (!generatedTables.Contains(pluralized))
                         {
-                                var nameOnly = file.Replace(@"\\", "").Replace(@"DBFilesClient\", "");
-                                var dbStream = new MemoryStream(File.ReadAllBytes($"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly}"));
+                            generatedTables.Add(pluralized);
 
-                                if (dbStream != null)
-                                {
-                                    nameOnly = nameOnly.Replace(@".dbc", "").Replace(@".db2", "");
+                            if (hasStringProperties)
+                                Console.Write($"Generating SQL data for {pluralized} ({locale.Key})...");
+                            else
+                                Console.Write($"Generating SQL data for {pluralized}...");
 
-                                    var pluralized = locale.Key + "_" + nameOnly.Replace(@".dbc", "").Replace(@".db2", "").Pluralize();
+                            var dbTable = DBReader.Read(dbStream, type);
 
-                                    Console.Write($"Generating SQL data for {pluralized} ({locale.Key})...");
+                            if (hasStringProperties)
+                            {
+                                localeMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
+                                localeMSSQL.Write(GenerateMSSQLData(pluralized, dbTable));
+                            }
+                            else
+                            {
+                                noLocaleMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
+                                noLocaleMSSQL.Write(GenerateMSSQLData(pluralized, dbTable));
+                            }
 
-                                    var ccp = new CSharpCodeProvider();
-                                    var paramss = new CompilerParameters();
+                            counter++;
 
-                                    paramss.GenerateExecutable = false;
-                                    paramss.GenerateInMemory = true;
+                            Console.ForegroundColor = ConsoleColor.Green;
 
-                                    paramss.ReferencedAssemblies.Add("ClientDBExtractor.exe");
-
-                                    var file1 = File.ReadAllText(structsPath + nameOnly + ".cs");
-                                    var code = new[] { file1 };
-
-                                    var result = ccp.CompileAssemblyFromSource(paramss, code);
-                                    var type = result.CompiledAssembly.GetTypes()[0];
-
-                                    var dbTable = DBReader.Read(dbStream, type);
-
-                                    mssql.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
-                                    mysql.Write(GenerateMSSQLData(pluralized, dbTable));
-
-                                    counter++;
-
-                                    Console.ForegroundColor = ConsoleColor.Green;
-
-                                    Console.Write("Done.");
-                                    Console.WriteLine();
-                                }
-                                else
-                                {
-                                    Console.ForegroundColor = ConsoleColor.Red;
-
-                                    Console.WriteLine($"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly} doesn't exist.");
-                                }
-
-                                Console.ForegroundColor = ConsoleColor.Gray;
+                            Console.Write("Done.");
+                            Console.WriteLine();
                         }
                     }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+
+                        Console.WriteLine($"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly} doesn't exist.");
+                    }
+
+                    Console.ForegroundColor = ConsoleColor.Gray;
                 }
+
+                localeMSSQL.Dispose();
+                localeMYSQL.Dispose();
             }
+
+            noLocaleMSSQL.Dispose();
+            noLocaleMYSQL.Dispose();
 
             Console.WriteLine("Generated Sql data for {0} ClientDB(s).", existingStructList.Count);
 
