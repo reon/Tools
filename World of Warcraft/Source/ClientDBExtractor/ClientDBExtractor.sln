@@ -1,11 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22129.1
+VisualStudioVersion = 14.0.22512.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientDBExtractor", "ClientDBExtractor.csproj", "{E08E1E48-6585-4137-8405-661C62C10713}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CASC Lib", "Libraries\CASC Lib\CASC Lib.shproj", "{5DE531EA-8BE2-4274-926E-3BF487E597D0}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Libraries\CASC Lib\CASC Lib.projitems*{e08e1e48-6585-4137-8405-661c62c10713}*SharedItemsImports = 4
+		Libraries\CASC Lib\CASC Lib.projitems*{5de531ea-8be2-4274-926e-3bf487e597d0}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

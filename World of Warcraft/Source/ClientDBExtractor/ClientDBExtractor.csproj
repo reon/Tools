@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ClientDBExtractor</RootNamespace>
     <AssemblyName>ClientDBExtractor</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -50,23 +50,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BLTEHandler.cs" />
-    <Compile Include="ByteArrayComparer.cs" />
-    <Compile Include="CASCConfig.cs" />
-    <Compile Include="CASCEntry.cs" />
-    <Compile Include="CASCHandler.cs" />
-    <Compile Include="CDNHandler.cs" />
     <Compile Include="CustomTypes.cs" />
     <Compile Include="DBReader.cs" />
-    <Compile Include="Extensions.cs" />
-    <Compile Include="Jenkins96.cs" />
-    <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReaderExtensions.cs" />
     <Compile Include="SqlCreator.cs" />
-    <Compile Include="Wildcard.cs" />
   </ItemGroup>
+  <Import Project="Libraries\CASC Lib\CASC Lib.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,6 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using CASC_Lib.CASC.Constants;
+using CASC_Lib.CASC.Handlers;
+using CASC_Lib.Misc;
 using ClientDBExtractor.Reader;
 using Microsoft.CSharp;
 
@@ -13,9 +17,6 @@ namespace ClientDBExtractor
 {
     class Program
     {
-        static CASCHandler cascHandler;
-        static CASCFolder root;
-
         static void Main(string[] args)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -30,15 +31,20 @@ namespace ClientDBExtractor
 
             Console.ForegroundColor = ConsoleColor.Gray;
 
+            Console.WriteLine("Initializing CASC library...");
+
+            var cascHandler = new CASCHandler(Environment.CurrentDirectory);
+
+            Console.WriteLine("Done.");
+
             Console.WriteLine("Searching for available ClientDB (dbc & db2) files...");
 
-            cascHandler = CASCHandler.OpenLocalStorage(Environment.CurrentDirectory + "\\");
 
             var fileList = new List<string>();
 
-            var wowBin = "Wow.exe";
-            var wowTBin = "WowT.exe";
-            var wowXBin = "World of Warcraft";
+            var wowBin = cascHandler.BasePath + "/Wow.exe";
+            var wowTBin = cascHandler.BasePath + "/WowT.exe";
+            var wowXBin = cascHandler.BasePath + "/World of Warcraft";
             var bin = "";
 
             if (File.Exists(wowBin))
@@ -56,7 +62,7 @@ namespace ClientDBExtractor
             }
 
             // Get dbc files from wow bin
-            using (var sr = new StreamReader(Environment.CurrentDirectory + "/" + bin))
+            using (var sr = new StreamReader(bin))
             {
                 var text = sr.ReadToEnd();
 
@@ -70,26 +76,22 @@ namespace ClientDBExtractor
             fileList.Add(@"DBFilesClient\AttackAnimTypes.dbc");
             fileList.Add(@"DBFilesClient\WowError_Strings.dbc");
 
-            Console.WriteLine("Found {0} available ClientDB files.", fileList.Count);
-
-            root = cascHandler.LoadListFile(fileList);
-
             Console.WriteLine("Getting available locales...");
 
-            var locales = new Dictionary<string, LocaleFlags>();
+            var locales = new Dictionary<string, Locales>();
 
             if (args.Length == 1)
-                locales.Add(args[0], (LocaleFlags)Enum.Parse(typeof(LocaleFlags), args[0]));
+                locales.Add(args[0], (Locales)Enum.Parse(typeof(Locales), args[0]));
             else
             {
-                var buildInfo = File.ReadAllText("./.build.info").Split(new[] { '|' })[19];
+                var buildInfo = File.ReadAllText(cascHandler.BasePath + "/.build.info").Split(new[] { '|' })[19];
                 var buildInfoLocales = Regex.Matches(buildInfo, " ([A-Za-z]{4}) speech");
 
 
                 foreach (Match m in buildInfoLocales)
                 {
                     var flagString = m.Value.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)[0];
-                    var localFlag = (LocaleFlags)Enum.Parse(typeof(LocaleFlags), flagString);
+                    var localFlag = (Locales)Enum.Parse(typeof(Locales), flagString);
 
                     if (!locales.ContainsKey(flagString))
                     {
@@ -109,13 +111,13 @@ namespace ClientDBExtractor
             var fileCtr = 0;
             var fileErrors = new List<string>();
 
-            foreach (var file in root.GetFiles())
+            foreach (var file in fileList)
             {
-                var nameOnly = file.FullName.Replace(@"\\", "").Replace(@"DBFilesClient\", "");
+                var nameOnly = file.Replace(@"\\", "").Replace(@"DBFilesClient\", "");
 
                 foreach (var locale in locales)
                 {
-                    var dbStream = cascHandler.SaveFileTo(file.FullName, "./", locale.Value);
+                    var dbStream = cascHandler.ReadFile(file, locale.Value);
 
                     Console.Write($"Writing file {nameOnly} ({locale.Key})...");
 
@@ -123,7 +125,7 @@ namespace ClientDBExtractor
                     {
                         Directory.CreateDirectory($"./Arctium/ClientDB/Files/{locale.Key}");
 
-                        File.WriteAllBytes($"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly}", dbStream.ToArray());
+                        Task.Run(() => FileWriter.WriteFile(dbStream, $"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly}"));
 
                         Console.ForegroundColor = ConsoleColor.Green;
 
@@ -190,7 +192,19 @@ namespace ClientDBExtractor
                 foreach (var file in existingStructList)
                 {
                     var nameOnly = file.Replace(@"\\", "").Replace(@"DBFilesClient\", "");
-                    var dbStream = new MemoryStream(File.ReadAllBytes($"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly}"));
+                    var path = $"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly}";
+
+                    if (!File.Exists(path))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+
+                        Console.WriteLine($"{path} doesn't exist.");
+                        Console.WriteLine("Skip it.");
+
+                        continue;
+                    }
+
+                    var dbStream = new MemoryStream(File.ReadAllBytes(path));
 
                     if (dbStream != null)
                     {
@@ -245,12 +259,6 @@ namespace ClientDBExtractor
                             Console.Write("Done.");
                             Console.WriteLine();
                         }
-                    }
-                    else
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-
-                        Console.WriteLine($"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly} doesn't exist.");
                     }
 
                     Console.ForegroundColor = ConsoleColor.Gray;
