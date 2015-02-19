@@ -405,7 +405,9 @@ namespace ClientDBExtractor
 
             sbData.AppendLine();
 
-            return sbData.ToString();
+            sbScheme.Append(sbData);
+
+            return sbScheme.ToString();
         }
 
         static string GenerateMSSQLData(string pluralized, DataTable dbTable)
