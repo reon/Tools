@@ -227,6 +227,9 @@ namespace ClientDBExtractor
 
                         var pluralized = nameOnly.Replace(@".dbc", "").Replace(@".db2", "").Pluralize();
 
+                        pluralized.Insert(0, pluralized[0].ToString().ToUpperInvariant());
+                        pluralized.Remove(1);
+
                         if (hasStringProperties)
                             pluralized = pluralized + "_" + locale.Key;
 
