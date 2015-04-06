@@ -1,11 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Arctium Emulation.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Data.Entity.Design.PluralizationServices;
 using System.Globalization;
+using System.IO;
+using System.Text;
 
-namespace ClientDBExtractor.Reader
+namespace DataExtractor.Reader
 {
     public static class Extensions
     {

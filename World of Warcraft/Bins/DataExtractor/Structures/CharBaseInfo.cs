@@ -1,6 +1,6 @@
-using ClientDBExtractor;
+using DataExtractor;
 
-namespace ClientDBExtractor.Structures
+namespace DataExtractor.Structures
 {
     public class CharBaseInfo
     {
