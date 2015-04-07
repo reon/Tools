@@ -100,7 +100,7 @@ namespace DataExtractor
                     }
                 }
 
-                File.WriteAllBytes( $"./Arctium/Maps/{mapName}.map", mapReader.Finish(map).ToArray());
+                File.WriteAllBytes( $"./Arctium/Maps/{map.Id:0000}.map", mapReader.Finish(map).ToArray());
 
                 Console.WriteLine($"Extraction of map '{mapName}' done.");
             });
