@@ -45,14 +45,14 @@ namespace CASC_Lib.CASC.Handlers
             }
 
             // Get CDN indices.
-            /*var indices = cdnConfig["archives"];
+            var indices = cdnConfig["archives"];
 
             for (var i = 0; i < indices.Length; i++)
             {
                 indexFiles.Add(indices[i]);
 
                 idxFiles.Add(new IndexFile($"{basePath}/Data/indices/{indices[i]}.index", true, (ushort)i));
-            }*/
+            }
 
             // Get available data.### files.
             foreach (var f in Directory.GetFiles(BasePath + "/Data/data", "data.*"))

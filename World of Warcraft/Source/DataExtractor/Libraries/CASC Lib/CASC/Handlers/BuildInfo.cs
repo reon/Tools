@@ -26,13 +26,22 @@ namespace CASC_Lib.CASC.Handlers
             using (var sr = new StreamReader(file))
             {
                 var header = sr.ReadLine().Split(new[] { '|', '!' });
-                var data = sr.ReadLine().Split(new[] { '|' });
+                var dataLine = "";
 
-                if (data.Length != header.Length / 2)
-                    throw new InvalidOperationException("bla...");
+                while ((dataLine = sr.ReadLine()) != null)
+                {
+                    var data = dataLine.Split(new[] { '|' });
 
-                for (var i = 0; i < data.Length; i++)
-                    entries.Add(header[i << 1], data[i]);
+                    if (data.Length != header.Length / 2)
+                        throw new InvalidOperationException("bla...");
+
+                    // Be sure to get the active build info.
+                    if (data[1] == "0")
+                        continue;
+
+                    for (var i = 0; i < data.Length; i++)
+                        entries.Add(header[i << 1], data[i]);
+                }
             }
         }
     }
