@@ -76,6 +76,7 @@ namespace DataExtractor
                         var headerLength = dbReader.BaseStream.Position;
                         var lastStringOffset = 0;
                         var lastString = "";
+                        var stringOffsetAdd = header.IsValidDbcFile ? 20 : 48;
 
                         table.BeginLoadData();
 
@@ -214,7 +215,7 @@ namespace DataExtractor
                                             if (stringOffset != lastStringOffset)
                                             {
                                                 var currentPos = dbReader.BaseStream.Position;
-                                                var stringStart = (header.RecordCount * header.RecordSize) + 20 + stringOffset;
+                                                var stringStart = (header.RecordCount * header.RecordSize) + stringOffsetAdd + stringOffset;
                                                 dbReader.BaseStream.Seek(stringStart, 0);
                                                 row[f.Name] = lastString = dbReader.ReadCString();
 

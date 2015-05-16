@@ -223,7 +223,7 @@ namespace DataExtractor
             Console.WriteLine("Getting structures...");
 
             var existingStructList = new List<string>();
-            var structsPath = Environment.CurrentDirectory + "/Structures/";
+            var structsPath = cascHandler.BasePath + "/Structures/";
             var structureNames = Directory.GetFiles(structsPath);
             var structureNameList = new List<string>(structureNames.Length);
 
