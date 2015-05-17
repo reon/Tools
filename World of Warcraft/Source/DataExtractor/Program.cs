@@ -22,6 +22,10 @@ namespace DataExtractor
     class Program
     {
         static CASCHandler cascHandler;
+        static List<string> pluralizationExceptions = new List<string>
+        {
+            "gtNpcTotalHp"
+        };
 
         static void Main(string[] args)
         {
@@ -295,7 +299,10 @@ namespace DataExtractor
                         var type = result.CompiledAssembly.GetTypes()[0];
                         var hasStringProperties = type.GetProperties().Any(p => p.PropertyType == typeof(string));
 
-                        var pluralized = nameOnly.Replace(@".dbc", "").Replace(@".db2", "").Pluralize();
+                        var pluralized = nameOnly.Replace(@".dbc", "").Replace(@".db2", "");
+                        
+                        if (!pluralizationExceptions.Contains(pluralized))
+                            pluralized = pluralized.Pluralize();
 
                         pluralized.Insert(0, pluralized[0].ToString().ToUpperInvariant());
                         pluralized.Remove(1);

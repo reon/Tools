@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CASC_Lib.CASC.Structures;
 using CASC_Lib.Misc;
 
