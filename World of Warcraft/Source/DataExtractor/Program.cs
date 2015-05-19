@@ -389,7 +389,7 @@ namespace DataExtractor
                         }
                         else if (c.ColumnName == "ID" || c.ColumnName == "Id" || c.ColumnName == nameOnly + "Id" || c.ColumnName == nameOnly + "ID"
                                  || c.ColumnName == "SpellId"
-                                 || c.ColumnName == "Spell" || c.ColumnName.EndsWith("Mask"))
+                                 || c.ColumnName == "Spell")
                         {
                             typeName = "int(11) unsigned NOT NULL";
                         }
