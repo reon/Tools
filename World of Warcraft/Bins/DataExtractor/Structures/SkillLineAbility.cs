@@ -7,8 +7,8 @@ namespace DataExtractor.Structures
         public uint Id;
         public uint SkillLine;
         public uint Spell;
-        public uint RaceMask;
-        public uint ClassMask;
+        public int RaceMask;
+        public int ClassMask;
         public uint MinSkillLineRank;
         public uint SupercedesSpell;
         public uint AcquireMethod;
