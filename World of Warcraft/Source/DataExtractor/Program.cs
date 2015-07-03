@@ -455,7 +455,14 @@ namespace DataExtractor
                 sbData.Append("(");
 
                 foreach (var d in r.ItemArray)
-                    sbData.Append(string.Format("'{0}', ", d.GetType() == typeof(string) ? d.ToString().Replace("\"", "\"\"").Replace("'", @"\'") : d));
+                {
+                    if (d.GetType() == typeof(string))
+                        sbData.Append(string.Format("'{0}', ",  d.ToString().Replace("\"", "\"\"").Replace("'", @"\'")));
+                    else if (d.GetType() == typeof(float))
+                        sbData.Append(string.Format("'{0}', ",  d.ToString().Replace(",", ".")));
+                    else
+                        sbData.Append(string.Format("'{0}', ",  d);
+                }
 
                 if (i == dbTable.Rows.Count - 1)
                 {
@@ -551,7 +558,14 @@ namespace DataExtractor
                 sbData.Append("(");
 
                 foreach (var d in r.ItemArray)
-                    sbData.Append(string.Format("'{0}', ", d.GetType() == typeof(string) ? d.ToString().Replace("\"", "\"\"").Replace("'", @"\'") : d));
+                {
+                    if (d.GetType() == typeof(string))
+                        sbData.Append(string.Format("'{0}', ",  d.ToString().Replace("\"", "\"\"").Replace("'", @"\'")));
+                    else if (d.GetType() == typeof(float))
+                        sbData.Append(string.Format("'{0}', ",  d.ToString().Replace(",", ".")));
+                    else
+                        sbData.Append(string.Format("'{0}', ",  d);
+                }
 
                 if (i == dbTable.Rows.Count - 1)
                 {
