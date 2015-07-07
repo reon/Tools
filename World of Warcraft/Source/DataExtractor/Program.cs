@@ -5,6 +5,7 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -228,6 +229,10 @@ namespace DataExtractor
 
             var existingStructList = new List<string>();
             var structsPath = cascHandler.BasePath + "/Structures/";
+
+            if (!Directory.Exists(structsPath))
+                Directory.CreateDirectory(structsPath);
+
             var structureNames = Directory.GetFiles(structsPath);
             var structureNameList = new List<string>(structureNames.Length);
 
@@ -455,14 +460,7 @@ namespace DataExtractor
                 sbData.Append("(");
 
                 foreach (var d in r.ItemArray)
-                {
-                    if (d.GetType() == typeof(string))
-                        sbData.Append(string.Format("'{0}', ",  d.ToString().Replace("\"", "\"\"").Replace("'", @"\'")));
-                    else if (d.GetType() == typeof(float))
-                        sbData.Append(string.Format("'{0}', ",  d.ToString().Replace(",", ".")));
-                    else
-                        sbData.Append(string.Format("'{0}', ",  d);
-                }
+                    sbData.AppendFormat(CultureInfo.GetCultureInfo("en-US").NumberFormat, "'{0}', ", d.GetType() == typeof(string) ? d.ToString().Replace("\"", "\"\"").Replace("'", @"\'") : d);
 
                 if (i == dbTable.Rows.Count - 1)
                 {
@@ -558,14 +556,7 @@ namespace DataExtractor
                 sbData.Append("(");
 
                 foreach (var d in r.ItemArray)
-                {
-                    if (d.GetType() == typeof(string))
-                        sbData.Append(string.Format("'{0}', ",  d.ToString().Replace("\"", "\"\"").Replace("'", @"\'")));
-                    else if (d.GetType() == typeof(float))
-                        sbData.Append(string.Format("'{0}', ",  d.ToString().Replace(",", ".")));
-                    else
-                        sbData.Append(string.Format("'{0}', ",  d);
-                }
+                    sbData.AppendFormat(CultureInfo.GetCultureInfo("en-US").NumberFormat, "'{0}', ", d.GetType() == typeof(string) ? d.ToString().Replace("\"", "\"\"").Replace("'", @"\'") : d);
 
                 if (i == dbTable.Rows.Count - 1)
                 {
