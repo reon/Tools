@@ -1,4 +1,4 @@
-### Arctium Emulation WoW ClientDB Extractor###
+### Project WoW ClientDB Extractor###
 
 #How to use<br />
 1. Put 'ClientDBExtractor.exe' & 'Structures' folder in your WoW directory.<br />

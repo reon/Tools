@@ -1,4 +1,4 @@
-﻿// Copyright (c) Arctium Emulation.
+﻿// Copyright (c) Multi-Emu.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -64,7 +64,7 @@ namespace DataExtractor
         {
             Console.WriteLine("Extracting map files...");
 
-            Directory.CreateDirectory("./Arctium/Maps");
+            Directory.CreateDirectory("./Project-WoW/Maps");
 
             var mapDBC = cascHandler.ReadFile(@"DBFilesClient\Map.dbc");
             var mapDBData = DBReader.Read(mapDBC, typeof(MapDB));
@@ -105,7 +105,7 @@ namespace DataExtractor
                     }
                 }
 
-                File.WriteAllBytes( $"./Arctium/Maps/{map.Id:0000}.map", mapReader.Finish(map).ToArray());
+                File.WriteAllBytes( $"./Project-WoW/Maps/{map.Id:0000}.map", mapReader.Finish(map).ToArray());
 
                 Console.WriteLine($"Extraction of map '{mapName}' done.");
             });
@@ -177,8 +177,8 @@ namespace DataExtractor
                 }
             }
 
-            Directory.CreateDirectory("./Arctium/ClientDB/SQL");
-            Directory.CreateDirectory("./Arctium/ClientDB/Files");
+            Directory.CreateDirectory("./Project-WoW/ClientDB/SQL");
+            Directory.CreateDirectory("./Project-WoW/ClientDB/Files");
 
             /// Files
             Console.WriteLine("Extracting files...");
@@ -198,9 +198,9 @@ namespace DataExtractor
 
                     if (dbStream != null)
                     {
-                        Directory.CreateDirectory($"./Arctium/ClientDB/Files/{locale.Key}");
+                        Directory.CreateDirectory($"./Project-WoW/ClientDB/Files/{locale.Key}");
 
-                        Task.Run(() => FileWriter.WriteFile(dbStream, $"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly}"));
+                        Task.Run(() => FileWriter.WriteFile(dbStream, $"./Project-WoW/ClientDB/Files/{locale.Key}/{nameOnly}"));
 
                         Console.ForegroundColor = ConsoleColor.Green;
 
@@ -260,18 +260,18 @@ namespace DataExtractor
             var generatedTables = new List<string>();
             var counter = 0;
 
-            var noLocaleMSSQL = new StreamWriter($"./Arctium/ClientDB/SQL/DataDB.MSSQL.sql");
-            var noLocaleMYSQL = new StreamWriter($"./Arctium/ClientDB/SQL/DataDB.MYSQL.sql");
+            var noLocaleMSSQL = new StreamWriter($"./Project-WoW/ClientDB/SQL/DataDB.MSSQL.sql");
+            var noLocaleMYSQL = new StreamWriter($"./Project-WoW/ClientDB/SQL/DataDB.MYSQL.sql");
 
             foreach (var locale in locales)
             {
-                var localeMSSQL = new StreamWriter($"./Arctium/ClientDB/SQL/{locale.Key}_DataDB.MSSQL.sql");
-                var localeMYSQL = new StreamWriter($"./Arctium/ClientDB/SQL/{locale.Key}_DataDB.MYSQL.sql");
+                var localeMSSQL = new StreamWriter($"./Project-WoW/ClientDB/SQL/{locale.Key}_DataDB.MSSQL.sql");
+                var localeMYSQL = new StreamWriter($"./Project-WoW/ClientDB/SQL/{locale.Key}_DataDB.MYSQL.sql");
 
                 foreach (var file in existingStructList)
                 {
                     var nameOnly = file.Replace(@"\\", "").Replace(@"DBFilesClient\", "");
-                    var path = $"./Arctium/ClientDB/Files/{locale.Key}/{nameOnly}";
+                    var path = $"./Project-WoW/ClientDB/Files/{locale.Key}/{nameOnly}";
 
                     if (!File.Exists(path))
                     {

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2012-2014 Arctium Emulation <http://arctium.org>
+ * Copyright (C) 2012-2015 Multi-Emu <https://www.multi-emu.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 using System;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading;
 using Connection_Patcher.Constants;
 
@@ -32,7 +31,7 @@ namespace Connection_Patcher
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
 
-                Console.WriteLine("Arctium Connection Patcher");
+                Console.WriteLine("Project WoW Connection Patcher");
                 Console.WriteLine("Press Enter to patch...");
 
                 Console.ReadKey(true);
