@@ -147,9 +147,6 @@ namespace DataExtractor
 
             // not in wow bin
             fileList.Add(@"DBFilesClient\WorldSafeLocs.dbc");
-            fileList.Add(@"DBFilesClient\AttackAnimKits.dbc");
-            fileList.Add(@"DBFilesClient\AttackAnimTypes.dbc");
-            fileList.Add(@"DBFilesClient\WowError_Strings.dbc");
 
             Console.WriteLine("Getting available locales...");
 
@@ -159,7 +156,7 @@ namespace DataExtractor
                 locales.Add(args[0], (Locales)Enum.Parse(typeof(Locales), args[0]));
             else
             {
-                var buildInfo = File.ReadAllText(cascHandler.BasePath + "/.build.info").Split(new[] { '|' })[19];
+                var buildInfo = File.ReadAllText(cascHandler.BasePath + "/.build.info").Split(new[] { '|' })[21];
                 var buildInfoLocales = Regex.Matches(buildInfo, " ([A-Za-z]{4}) speech");
 
 
@@ -361,10 +358,14 @@ namespace DataExtractor
             Console.ForegroundColor = ConsoleColor.Red;
 
             Console.WriteLine();
-            Console.WriteLine("ERROS WHILE EXTRACTING:");
 
-            foreach (var s in fileErrors)
-                Console.WriteLine(s);
+            if (fileErrors.Count > 0)
+            {
+                Console.WriteLine("ERROS WHILE EXTRACTING:");
+
+                foreach (var s in fileErrors)
+                    Console.WriteLine(s);
+            }
 
             Console.ForegroundColor = ConsoleColor.Gray;
         }
