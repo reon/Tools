@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2012-2015 Multi-Emu <https://www.multi-emu.com>
+ * Copyright (C) 2012-2015 Arctium Emulation <http://www.arctium-emulation.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Multi-Emu.
+﻿// Copyright (c) Arctium Emulation.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -32,12 +32,18 @@ namespace DataExtractor
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
 
-            Console.WriteLine("_____________World of Warcraft_____________");
-            Console.WriteLine("    __                                     ");
-            Console.WriteLine("    / |                     ,              ");
-            Console.WriteLine("---/__|---)__----__--_/_--------------_--_-");
-            Console.WriteLine("  /   |  /   ) /   ' /    /   /   /  / /  )");
-            Console.WriteLine("_/____|_/_____(___ _(_ __/___(___(__/_/__/_");
+            Console.WriteLine(@"                   _   _                 ");
+            Console.WriteLine(@"    /\            | | (_)                ");
+            Console.WriteLine(@"   /  \   _ __ ___| |_ _ _   _ _ __ ___  ");
+            Console.WriteLine(@"  / /\ \ | '__/ __| __| | | | | '_ ` _ \ ");
+            Console.WriteLine(@" / ____ \| | | (__| |_| | |_| | | | | | |");
+            Console.WriteLine(@"/_/    \_\_|  \___|\__|_|\__,_|_| |_| |_|");
+            Console.WriteLine(@"           _                             ");
+            Console.WriteLine(@"          |_._ _   | __|_ o _._          ");
+            Console.WriteLine(@"          |_| | |_||(_||_ |(_| |         ");
+            Console.WriteLine();
+
+            Console.WriteLine($"{"www.arctium-emulation.com",33}");
             Console.WriteLine();
 
             Console.ForegroundColor = ConsoleColor.Gray;
