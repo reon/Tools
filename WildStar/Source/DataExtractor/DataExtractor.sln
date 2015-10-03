@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataExtractor", "DataExtractor\DataExtractor.csproj", "{B05CB91F-F48B-4825-B8D7-8E748F45D2BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArchiveLib", "ArchiveLib\ArchiveLib.csproj", "{6CC8E348-18E2-4904-9486-F1938D87C666}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B05CB91F-F48B-4825-B8D7-8E748F45D2BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B05CB91F-F48B-4825-B8D7-8E748F45D2BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B05CB91F-F48B-4825-B8D7-8E748F45D2BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B05CB91F-F48B-4825-B8D7-8E748F45D2BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CC8E348-18E2-4904-9486-F1938D87C666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC8E348-18E2-4904-9486-F1938D87C666}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC8E348-18E2-4904-9486-F1938D87C666}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC8E348-18E2-4904-9486-F1938D87C666}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
