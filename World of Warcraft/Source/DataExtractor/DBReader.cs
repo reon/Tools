@@ -1,4 +1,4 @@
-﻿// Copyright (c) Arctium Emulation.
+// Copyright (c) Arctium Emulation.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -16,20 +16,21 @@ namespace DataExtractor
         public uint RecordSize      { get; set; }
         public uint StringBlockSize { get; set; }
 
-        // DB2
-        public uint Hash     { get; set; }
-        public uint Build    { get; set; }
-        public uint Unknown  { get; set; }
-        public int Min       { get; set; }
-        public int Max       { get; set; }
-        public int Locale    { get; set; }
-        public int Unknown2  { get; set; }
-        public byte[] Bytes  { get; set; }
-        public byte[] Bytes2 { get; set; }
+        // DB3
+        public uint Hash         { get; set; }
+        public uint Build        { get; set; }
+        public uint Unknown      { get; set; }
+        public int Min           { get; set; }
+        public int Max           { get; set; }
+        public int Locale        { get; set; }
+        public int Unknown2      { get; set; }
+        public byte[] Data       { get; set; } = new byte[0];
+        public byte[] IndexData  { get; set; } = new byte[0];
+        public byte[] StringData { get; set; } = new byte[0];
 
         // Signature checks
         public bool IsValidDbcFile { get { return Signature == "WDBC"; } }
-        public bool IsValidDb2File { get { return Signature == "WDB2"; } }
+        public bool IsValidDb3File { get { return Signature == "WDB3"; } }
     }
 
     class DBReader
@@ -40,208 +41,252 @@ namespace DataExtractor
 
             try
             {
-                using (var dbReader = new BinaryReader(dbStream))
+                var dbReader = new BinaryReader(dbStream);
+
+                var header = new DBHeader
                 {
-                    var header = new DBHeader
-                    {
-                        Signature = dbReader.ReadString(4),
-                        RecordCount = dbReader.Read<uint>(),
-                        FieldCount = dbReader.Read<uint>(),
-                        RecordSize = dbReader.Read<uint>(),
-                        StringBlockSize = dbReader.Read<uint>()
-                    };
+                    Signature = dbReader.ReadString(4),
+                    RecordCount = dbReader.Read<uint>(),
+                    FieldCount = dbReader.Read<uint>(),
+                    RecordSize = dbReader.Read<uint>(),
+                    StringBlockSize = dbReader.Read<uint>()
+                };
 
-                    if (header.IsValidDb2File)
-                    {
-                        header.Hash = dbReader.Read<uint>();
-                        header.Build = dbReader.Read<uint>();
-                        header.Unknown = dbReader.Read<uint>();
-                        header.Min = dbReader.Read<int>();
-                        header.Max = dbReader.Read<int>();
-                        header.Locale = dbReader.Read<int>();
-                        header.Unknown2 = dbReader.Read<int>();
+                if (header.IsValidDb3File)
+                {
+                    header.Hash = dbReader.Read<uint>();
+                    header.Build = dbReader.Read<uint>();
+                    header.Unknown = dbReader.Read<uint>();
 
-                        if (header.Max != 0)
+                    header.Min = dbReader.Read<int>();
+                    header.Max = dbReader.Read<int>();
+                    header.Locale = dbReader.Read<int>();
+                    header.Unknown2 = dbReader.Read<int>();
+
+                    var dataSize = header.RecordCount * header.RecordSize;
+                    var indexDataSize = header.RecordCount * 4;
+
+                    if (header.Min != 0 && header.Max != 0)
+                    {
+                        header.Data = dbReader.ReadBytes((int)dataSize);
+                        header.StringData = dbReader.ReadBytes((int)header.StringBlockSize);
+
+                        if (dbReader.BaseStream.Position != dbReader.BaseStream.Length)
+                            header.IndexData = dbReader.ReadBytes((int)indexDataSize);
+
+                        var data = new BinaryWriter(new MemoryStream());
+                        var dataReader = new BinaryReader(new MemoryStream(header.Data));
+                        var indexDataReader = new BinaryReader(new MemoryStream(header.IndexData));
+
+                        if (header.IndexData.Length == 0)
                         {
-                            var diff = (header.Max - header.Min) + 1;
-
-                            header.Bytes = dbReader.ReadBytes(diff * 4);
-                            header.Bytes2 = dbReader.ReadBytes(diff * 2);
+                            for (var i = 0; i < header.RecordCount; i++)
+                            {
+                                data.Write(i);
+                                data.Write(dataReader.ReadBytes((int)header.RecordSize));
+                            }
                         }
+                        else
+                        {
+                            for (var i = 0; i < header.RecordCount; i++)
+                            {
+                                data.Write(indexDataReader.ReadBytes(4));
+                                data.Write(dataReader.ReadBytes((int)header.RecordSize));
+                            }
+                        }
+
+                        data.Write(header.StringData);
+
+                        dataReader.Dispose();
+                        indexDataReader.Dispose();
+
+                        dbReader = new BinaryReader(data.BaseStream);
+                        dbReader.BaseStream.Position = 0;
+                    }
+                }
+
+                if (header.IsValidDbcFile || header.IsValidDb3File)
+                {
+                    var fields = type.GetFields();
+                    var headerLength = dbReader.BaseStream.Position;
+                    var lastStringOffset = 0;
+                    var lastString = "";
+                    var headerSize = header.IsValidDbcFile ? 20 : 0;
+
+                    table.BeginLoadData();
+
+                    foreach (var f in fields)
+                    {
+                        if (f.FieldType == typeof(Unused) || f.FieldType == typeof(UnusedByte) || f.FieldType == typeof(UnusedShort) || f.FieldType == typeof(UnusedLong) ||
+                            f.FieldType == typeof(Unused[]) || f.FieldType == typeof(UnusedByte[]) || f.FieldType == typeof(UnusedShort[]) || f.FieldType == typeof(UnusedLong[]))
+                            continue;
+
+                        if (f.FieldType.IsArray)
+                        {
+                            var arr = f.GetValue(Activator.CreateInstance(type)) as Array;
+
+                            for (var i = 0; i < arr.Length; i++)
+                                table.Columns.Add(f.Name + i, arr.GetValue(0).GetType());
+                        }
+                        else
+                            table.Columns.Add(f.Name, f.FieldType);
                     }
 
-                    if (header.IsValidDbcFile || header.IsValidDb2File)
+                    for (int i = 0; i < header.RecordCount; i++)
                     {
-                        var fields = type.GetFields();
-                        var headerLength = dbReader.BaseStream.Position;
-                        var lastStringOffset = 0;
-                        var lastString = "";
-                        var stringOffsetAdd = header.IsValidDbcFile ? 20 : 48;
-
-                        table.BeginLoadData();
+                        var newObj = Activator.CreateInstance(type);
+                        var row = table.NewRow();
 
                         foreach (var f in fields)
                         {
-                            if (f.FieldType == typeof(Unused) || f.FieldType == typeof(UnusedByte) || f.FieldType == typeof(UnusedShort) || f.FieldType == typeof(UnusedLong) ||
-                                f.FieldType == typeof(Unused[]) || f.FieldType == typeof(UnusedByte[]) || f.FieldType == typeof(UnusedShort[]) || f.FieldType == typeof(UnusedLong[]))
-                                continue;
-
-                                if (f.FieldType.IsArray)
-                                {
-                                    var arr = f.GetValue(Activator.CreateInstance(type)) as Array;
-
-                                    for (var i = 0; i < arr.Length; i++)
-                                        table.Columns.Add(f.Name + i, arr.GetValue(0).GetType());
-                                }
-                                else
-                                    table.Columns.Add(f.Name, f.FieldType);
-                            }
-
-                        for (int i = 0; i < header.RecordCount; i++)
-                        {
-                            var newObj = Activator.CreateInstance(type);
-                            var row = table.NewRow();
-
-                            foreach (var f in fields)
+                            switch (f.FieldType.Name)
                             {
-                                switch (f.FieldType.Name)
+                                case "Unused":
+                                    dbReader.BaseStream.Position += 4;
+                                    break;
+                                case "UnusedByte":
+                                    dbReader.BaseStream.Position += 1;
+                                    break;
+                                case "UnusedShort":
+                                    dbReader.BaseStream.Position += 2;
+                                    break;
+                                case "UnusedLong":
+                                    dbReader.BaseStream.Position += 8;
+                                    break;
+                                case "SByte":
+                                    row[f.Name] = dbReader.ReadSByte();
+                                    break;
+                                case "Byte":
+                                    row[f.Name] = dbReader.ReadByte();
+                                    break;
+                                case "Int16":
+                                    row[f.Name] = dbReader.ReadInt16();
+                                    break;
+                                case "UInt16":
+                                    row[f.Name] = dbReader.ReadUInt16();
+                                    break;
+                                case "Int32":
+                                    row[f.Name] = dbReader.ReadInt32();
+                                    break;
+                                case "UInt32":
+                                    row[f.Name] = dbReader.ReadUInt32();
+                                    break;
+                                case "Int64":
+                                    row[f.Name] = dbReader.ReadInt64();
+                                    break;
+                                case "UInt64":
+                                    row[f.Name] = dbReader.ReadUInt64();
+                                    break;
+                                case "Single":
+                                    row[f.Name] = dbReader.ReadSingle();
+                                    break;
+                                case "Boolean":
+                                    row[f.Name] = dbReader.ReadBoolean();
+                                    break;
+                                case "Unused[]":
+                                    var length = ((Unused[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        dbReader.BaseStream.Position += 4;
+                                    break;
+                                case "UnusedByte[]":
+                                    length = ((Unused[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        dbReader.BaseStream.Position += 4;
+                                    break;
+                                case "UnusedLong[]":
+                                    length = ((Unused[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        dbReader.BaseStream.Position += 4;
+                                    break;
+                                case "UnusedShort[]":
+                                    length = ((Unused[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        dbReader.BaseStream.Position += 4;
+                                    break;
+                                case "SByte[]":
+                                    length = ((sbyte[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadSByte();
+                                    break;
+                                case "Byte[]":
+                                    length = ((byte[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadByte();
+                                    break;
+                                case "Int32[]":
+                                    length = ((int[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadInt32();
+                                    break;
+                                case "UInt32[]":
+                                    length = ((uint[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadUInt32();
+                                    break;
+                                case "Single[]":
+                                    length = ((float[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadSingle();
+                                    break;
+                                case "Int64[]":
+                                    length = ((long[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadInt64();
+                                    break;
+                                case "UInt64[]":
+                                    length = ((ulong[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadUInt64();
+                                    break;
+                                case "String":
                                 {
-                                    case "Unused":
-                                        dbReader.BaseStream.Position += 4;
-                                        break;
-                                    case "UnusedByte":
-                                        dbReader.BaseStream.Position += 1;
-                                        break;
-                                    case "UnusedShort":
-                                        dbReader.BaseStream.Position += 2;
-                                        break;
-                                    case "UnusedLong":
-                                        dbReader.BaseStream.Position += 8;
-                                        break;
-                                    case "SByte":
-                                        row[f.Name] = dbReader.ReadSByte();
-                                        break;
-                                    case "Byte":
-                                        row[f.Name] = dbReader.ReadByte();
-                                        break;
-                                    case "Int32":
-                                        row[f.Name] = dbReader.ReadInt32();
-                                        break;
-                                    case "UInt32":
-                                        row[f.Name] = dbReader.ReadUInt32();
-                                        break;
-                                    case "Int64":
-                                        row[f.Name] = dbReader.ReadInt64();
-                                        break;
-                                    case "UInt64":
-                                        row[f.Name] = dbReader.ReadUInt64();
-                                        break;
-                                    case "Single":
-                                        row[f.Name] = dbReader.ReadSingle();
-                                        break;
-                                    case "Boolean":
-                                        row[f.Name] = dbReader.ReadBoolean();
-                                        break;
-                                    case "Unused[]":
-                                        var length = ((Unused[])f.GetValue(newObj)).Length;
+                                    var stringOffset = dbReader.ReadUInt32();
 
-                                        for (var j = 0; j < length; j++)
-                                            dbReader.BaseStream.Position += 4;
-                                        break;
-                                    case "UnusedByte[]":
-                                        length = ((Unused[])f.GetValue(newObj)).Length;
+                                    if (stringOffset != lastStringOffset)
+                                    {
+                                        var currentPos = dbReader.BaseStream.Position;
+                                        var stringStart = (header.RecordCount * header.RecordSize) + headerSize + stringOffset;
 
-                                        for (var j = 0; j < length; j++)
-                                            dbReader.BaseStream.Position += 4;
-                                        break;
-                                    case "UnusedLong[]":
-                                        length = ((Unused[])f.GetValue(newObj)).Length;
+                                        if (header.IsValidDb3File)
+                                            stringStart += (header.RecordCount * 4);
 
-                                        for (var j = 0; j < length; j++)
-                                            dbReader.BaseStream.Position += 4;
-                                        break;
-                                    case "UnusedShort[]":
-                                        length = ((Unused[])f.GetValue(newObj)).Length;
+                                        dbReader.BaseStream.Seek(stringStart, 0);
 
-                                        for (var j = 0; j < length; j++)
-                                            dbReader.BaseStream.Position += 4;
-                                        break;
-                                    case "SByte[]":
-                                        length = ((sbyte[])f.GetValue(newObj)).Length;
+                                        row[f.Name] = lastString = dbReader.ReadCString();
 
-                                        for (var j = 0; j < length; j++)
-                                            row[f.Name + j] = dbReader.ReadSByte();
-                                        break;
-                                    case "Byte[]":
-                                        length = ((byte[])f.GetValue(newObj)).Length;
+                                        dbReader.BaseStream.Seek(currentPos, 0);
+                                    }
+                                    else
+                                        row[f.Name] = lastString;
 
-                                        for (var j = 0; j < length; j++)
-                                            row[f.Name + j] = dbReader.ReadByte();
-                                        break;
-                                    case "Int32[]":
-                                        length = ((int[])f.GetValue(newObj)).Length;
-
-                                        for (var j = 0; j < length; j++)
-                                            row[f.Name + j] = dbReader.ReadInt32();
-                                        break;
-                                    case "UInt32[]":
-                                        length = ((uint[])f.GetValue(newObj)).Length;
-
-                                        for (var j = 0; j < length; j++)
-                                            row[f.Name + j] = dbReader.ReadUInt32();
-                                        break;
-                                    case "Single[]":
-                                        length = ((float[])f.GetValue(newObj)).Length;
-
-                                        for (var j = 0; j < length; j++)
-                                            row[f.Name + j] = dbReader.ReadSingle();
-                                        break;
-                                    case "Int64[]":
-                                        length = ((long[])f.GetValue(newObj)).Length;
-
-                                        for (var j = 0; j < length; j++)
-                                            row[f.Name + j] = dbReader.ReadInt64();
-                                        break;
-                                    case "UInt64[]":
-                                        length = ((ulong[])f.GetValue(newObj)).Length;
-
-                                        for (var j = 0; j < length; j++)
-                                            row[f.Name + j] = dbReader.ReadUInt64();
-                                        break;
-                                    case "String":
-                                        {
-                                            var stringOffset = dbReader.ReadUInt32();
-
-                                            if (stringOffset != lastStringOffset)
-                                            {
-                                                var currentPos = dbReader.BaseStream.Position;
-                                                var stringStart = (header.RecordCount * header.RecordSize) + stringOffsetAdd + stringOffset;
-                                                dbReader.BaseStream.Seek(stringStart, 0);
-                                                row[f.Name] = lastString = dbReader.ReadCString();
-
-                                                dbReader.BaseStream.Seek(currentPos, 0);
-                                            }
-                                            else
-                                                row[f.Name] = lastString;
-
-                                            break;
-                                        }
-                                    default:
-                                        dbReader.BaseStream.Position += 4;
-                                        break;
+                                    break;
                                 }
+                                default:
+                                    dbReader.BaseStream.Position += 4;
+                                    break;
                             }
-
-                            // Read remaining bytes if needed
-                            var remainingBytes = (int)(dbReader.BaseStream.Position - headerLength) % 4;
-
-                            dbReader.ReadBytes(remainingBytes);
-
-                            table.Rows.Add(row);
                         }
 
-                        table.EndLoadData();
+                        // Read remaining bytes if needed
+                        var remainingBytes = (int)(dbReader.BaseStream.Position - headerLength) % 4;
+
+                        dbReader.ReadBytes(header.IsValidDb3File ? 4 - remainingBytes : remainingBytes);
+
+                        table.Rows.Add(row);
                     }
+
+                    table.EndLoadData();
                 }
             }
             catch
