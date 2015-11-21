@@ -124,6 +124,7 @@ namespace DataExtractor
             var fileList = new List<string>();
 
             var wowBin = cascHandler.BasePath + "/Wow.exe";
+            var wowBBin = cascHandler.BasePath + "/WowB.exe";
             var wowTBin = cascHandler.BasePath + "/WowT.exe";
             var wowXBin = cascHandler.BasePath + "/World of Warcraft";
             var bin = "";
@@ -134,6 +135,8 @@ namespace DataExtractor
                 bin = wowTBin;
             else if (File.Exists(wowXBin))
                 bin = wowXBin;
+            else if (File.Exists(wowBBin))
+                bin = wowBBin;
             else
             {
                 Console.WriteLine("No valid World of Warcraft version found.");

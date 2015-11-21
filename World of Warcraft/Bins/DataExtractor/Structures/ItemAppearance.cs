@@ -7,5 +7,6 @@ namespace DataExtractor.Structures
         public int Id;
         public int DisplayId;
         public int FileDataId; // FileData.dbc, Icon
+        public byte Unknown;
     }
 }

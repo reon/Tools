@@ -5,17 +5,17 @@ namespace DataExtractor.Structures
     public class SkillLineAbility
     {
         public uint Id;
-        public uint SkillLine;
         public uint Spell;
         public int RaceMask;
         public int ClassMask;
-        public uint MinSkillLineRank;
         public uint SupercedesSpell;
-        public uint AcquireMethod;
-        public uint TrivialSkillLineRankHigh;
-        public uint TrivialSkillLineRankLow;
-        public uint NumSkillUps;
-        public uint UniqueBit;
-        public uint TradeSkillCategoryId;
+        public ushort SkillLine;
+        public ushort MinSkillLineRank;
+        public ushort TrivialSkillLineRankHigh;
+        public ushort TrivialSkillLineRankLow;
+        public ushort UniqueBit;
+        public ushort TradeSkillCategoryId;
+        public byte AcquireMethod;
+        public byte NumSkillUps;
     }
 }

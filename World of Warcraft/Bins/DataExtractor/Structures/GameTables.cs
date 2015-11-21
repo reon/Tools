@@ -6,7 +6,7 @@ namespace DataExtractor.Structures
     {
         public int Index;
         public string Name;
-        public int NumRows;
-        public int NumColumns;
+        public short NumRows;
+        public byte NumColumns;
     }
 }

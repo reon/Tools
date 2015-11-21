@@ -5,13 +5,14 @@ namespace DataExtractor.Structures
     public class SkillLine
     {
         public uint ID;
-        public uint CategoryID;
-        public Unused DisplayNameLang;
-        public Unused DescriptionLang;
-        public Unused SpellIconID;
-        public Unused AlternateVerbLang;
-        public uint CanLink;
-        public uint ParentSkillLineID;
-        public uint Flags;
+        public Unused DisplayNameLang;   // string
+        public Unused DescriptionLang;   // string
+        public Unused AlternateVerbLang; // string
+        public UnusedShort SpellIconID;
+        public ushort Flags;
+        public byte CategoryID;
+        public byte CanLink;
+        public byte ParentSkillLineID;
+        
     }
 }

@@ -6,7 +6,7 @@ namespace DataExtractor.Structures
     {
         public uint Id;
         public string Name;
-        public uint RaceId;
-        public uint Sex;
+        public byte RaceId;
+        public byte Sex;
     }
 }

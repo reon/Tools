@@ -5,13 +5,12 @@ namespace DataExtractor.Structures
     public class Item
     {
         public int Id;
-        public int Class;
-        public int SubClass;
-        public int SoundOverrideSubClassId;
-        public int Material;
-        public int InventoryType;
-        public int SheatheType;
         public int FileDataId;             // FileData.dbc, Icon
-        public int Unknown2;
+        public byte Class;
+        public byte SubClass;
+        public byte SoundOverrideSubClassId;
+        public byte Material;
+        public byte InventoryType;
+        public byte SheatheType;
     }
 }

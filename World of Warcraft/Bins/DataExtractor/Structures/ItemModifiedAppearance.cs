@@ -6,9 +6,8 @@ namespace DataExtractor.Structures
     {
         public int Id;
         public int ItemId;
-        public int Mode;
-        public int AppearanceId;
-        public int FileDataId;   // FileData.dbc, Icon
-        public int Version;
+        public ushort AppearanceId;
+        public byte Mode;
+        public byte Version;
     }
 }
