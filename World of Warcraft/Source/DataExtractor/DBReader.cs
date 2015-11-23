@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using DataExtractor.Reader;
@@ -28,6 +29,7 @@ namespace DataExtractor
         public byte[] IndexData  { get; set; } = new byte[0];
         public byte[] StringData { get; set; } = new byte[0];
         public byte[] ReferenceDataBlock { get; set; } = new byte[0];
+        public Dictionary<uint, ushort> DataBlockOffsets { get; set; } = new Dictionary<uint, ushort>();
 
         // Signature checks
         public bool IsValidDbcFile { get { return Signature == "WDBC"; } }
@@ -70,7 +72,41 @@ namespace DataExtractor
 
                     if (header.Min != 0 && header.Max != 0)
                     {
-                        header.Data = dbReader.ReadBytes((int)dataSize);
+                        var recordSizeList = new List<ushort>();
+
+                        // Use 0xFF for guessing that type of data blocks...
+                        if (header.RecordSize > 0xFF)
+                        {
+                            var dataStart = dbReader.ReadUInt32();
+
+                            dbReader.BaseStream.Position -= 4;
+
+                            while (dbReader.BaseStream.Position != dataStart)
+                            {
+                                var offset = dbReader.ReadUInt32();
+                                var size = dbReader.ReadUInt16();
+
+                                if (offset > 0 && !header.DataBlockOffsets.ContainsKey(offset))
+                                    header.DataBlockOffsets.Add(offset, size);
+                            }
+
+                            var dataBlockWriter = new BinaryWriter(new MemoryStream());
+
+                            foreach (var dataBlockOffset in header.DataBlockOffsets)
+                            {
+                                dbReader.BaseStream.Position = dataBlockOffset.Key;
+
+                                dataBlockWriter.Write(dbReader.ReadBytes(dataBlockOffset.Value));
+
+                                recordSizeList.Add(dataBlockOffset.Value);
+                            }
+
+                            header.Data = (dataBlockWriter.BaseStream as MemoryStream).ToArray();
+
+                            dbReader.BaseStream.Position = dataStart + header.Data.Length;
+                        }
+                        else
+                            header.Data = dbReader.ReadBytes((int)dataSize);
 
                         var hasIndex = dbReader.BaseStream.Position + header.StringBlockSize + header.ReferenceDataSize < dbReader.BaseStream.Length;
 
@@ -93,10 +129,22 @@ namespace DataExtractor
                         }
                         else
                         {
-                            for (var i = 0; i < header.RecordCount; i++)
+                            // Use 0xFF for guessing that type of data blocks...
+                            if (header.RecordSize > 0xFF)
                             {
-                                data.Write(indexDataReader.ReadBytes(4));
-                                data.Write(dataReader.ReadBytes((int)header.RecordSize));
+                                for (var i = 0; i < header.RecordCount; i++)
+                                {
+                                    data.Write(indexDataReader.ReadBytes(4));
+                                    data.Write(dataReader.ReadBytes(recordSizeList[i]));
+                                }
+                            }
+                            else
+                            {
+                                for (var i = 0; i < header.RecordCount; i++)
+                                {
+                                    data.Write(indexDataReader.ReadBytes(4));
+                                    data.Write(dataReader.ReadBytes((int)header.RecordSize));
+                                }
                             }
                         }
 
@@ -225,6 +273,18 @@ namespace DataExtractor
                                     for (var j = 0; j < length; j++)
                                         row[f.Name + j] = dbReader.ReadByte();
                                     break;
+                                case "Int16[]":
+                                    length = ((short[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadInt16();
+                                    break;
+                                case "UInt16[]":
+                                    length = ((ushort[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                        row[f.Name + j] = dbReader.ReadUInt16();
+                                    break;
                                 case "Int32[]":
                                     length = ((int[])f.GetValue(newObj)).Length;
 
@@ -257,24 +317,33 @@ namespace DataExtractor
                                     break;
                                 case "String":
                                 {
-                                    var stringOffset = dbReader.ReadUInt32();
-
-                                    if (stringOffset != lastStringOffset)
+                                    if (header.RecordSize > 0xFF)
                                     {
-                                        var currentPos = dbReader.BaseStream.Position;
-                                        var stringStart = (header.RecordCount * header.RecordSize) + headerSize + stringOffset;
-
-                                        if (header.IsValidDb3File)
-                                            stringStart += (header.RecordCount * 4);
-
-                                        dbReader.BaseStream.Seek(stringStart, 0);
-
-                                        row[f.Name] = lastString = dbReader.ReadCString();
-
-                                        dbReader.BaseStream.Seek(currentPos, 0);
+                                        row[f.Name] = dbReader.ReadCString();
                                     }
                                     else
-                                        row[f.Name] = lastString;
+                                    {
+
+                                        var stringOffset = dbReader.ReadUInt32();
+
+                                        if (stringOffset != lastStringOffset)
+                                        {
+                                            var currentPos = dbReader.BaseStream.Position;
+                                            var stringStart = (header.RecordCount*header.RecordSize) + headerSize +
+                                                              stringOffset;
+
+                                            if (header.IsValidDb3File)
+                                                stringStart += (header.RecordCount*4);
+
+                                            dbReader.BaseStream.Seek(stringStart, 0);
+
+                                            row[f.Name] = lastString = dbReader.ReadCString();
+
+                                            dbReader.BaseStream.Seek(currentPos, 0);
+                                        }
+                                        else
+                                            row[f.Name] = lastString;
+                                    }
 
                                     break;
                                 }
@@ -284,11 +353,17 @@ namespace DataExtractor
                             }
                         }
 
-                        // Read remaining bytes if needed
-                        var remainingBytes = (int)(dbReader.BaseStream.Position - headerLength) % 4;
+                        if (header.RecordSize <= 0xFF)
+                        {
+                            // Read remaining bytes if needed
+                            var remainingBytes = (int) (dbReader.BaseStream.Position - headerLength) % 4;
 
-                        if (remainingBytes > 0)
-                            dbReader.ReadBytes(header.IsValidDb3File ? 4 - remainingBytes : remainingBytes);
+                            if (remainingBytes > 0)
+                                dbReader.ReadBytes(header.IsValidDb3File ? 4 - remainingBytes : remainingBytes);
+                        }
+                        else
+                            // 3 taken from Item-sparse data block. Not sure if other files have the same...
+                            dbReader.BaseStream.Position += 3;
 
                         table.Rows.Add(row);
                     }
