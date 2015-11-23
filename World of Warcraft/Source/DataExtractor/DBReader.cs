@@ -1,4 +1,4 @@
-// Copyright (c) Arctium Emulation.
+﻿// Copyright (c) Arctium Emulation.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -23,10 +23,11 @@ namespace DataExtractor
         public int Min           { get; set; }
         public int Max           { get; set; }
         public int Locale        { get; set; }
-        public int Unknown2      { get; set; }
+        public int ReferenceDataSize { get; set; }
         public byte[] Data       { get; set; } = new byte[0];
         public byte[] IndexData  { get; set; } = new byte[0];
         public byte[] StringData { get; set; } = new byte[0];
+        public byte[] ReferenceDataBlock { get; set; } = new byte[0];
 
         // Signature checks
         public bool IsValidDbcFile { get { return Signature == "WDBC"; } }
@@ -35,9 +36,10 @@ namespace DataExtractor
 
     class DBReader
     {
-        public static DataTable Read(MemoryStream dbStream, Type type)
+        public static Tuple<DataTable, DataTable> Read(MemoryStream dbStream, Type type)
         {
             var table = new DataTable();
+            var refData = new DataTable();
 
             try
             {
@@ -61,7 +63,7 @@ namespace DataExtractor
                     header.Min = dbReader.Read<int>();
                     header.Max = dbReader.Read<int>();
                     header.Locale = dbReader.Read<int>();
-                    header.Unknown2 = dbReader.Read<int>();
+                    header.ReferenceDataSize = dbReader.Read<int>();
 
                     var dataSize = header.RecordCount * header.RecordSize;
                     var indexDataSize = header.RecordCount * 4;
@@ -69,22 +71,25 @@ namespace DataExtractor
                     if (header.Min != 0 && header.Max != 0)
                     {
                         header.Data = dbReader.ReadBytes((int)dataSize);
+
+                        var hasIndex = dbReader.BaseStream.Position + header.StringBlockSize + header.ReferenceDataSize < dbReader.BaseStream.Length;
+
                         header.StringData = dbReader.ReadBytes((int)header.StringBlockSize);
 
-                        if (dbReader.BaseStream.Position != dbReader.BaseStream.Length)
+                        if (hasIndex)
                             header.IndexData = dbReader.ReadBytes((int)indexDataSize);
+
+                        if (dbReader.BaseStream.Position != dbReader.BaseStream.Length)
+                            header.ReferenceDataBlock = dbReader.ReadBytes(header.ReferenceDataSize);
 
                         var data = new BinaryWriter(new MemoryStream());
                         var dataReader = new BinaryReader(new MemoryStream(header.Data));
                         var indexDataReader = new BinaryReader(new MemoryStream(header.IndexData));
 
-                        if (header.IndexData.Length == 0)
+                        if (!hasIndex)
                         {
                             for (var i = 0; i < header.RecordCount; i++)
-                            {
-                                data.Write(i);
                                 data.Write(dataReader.ReadBytes((int)header.RecordSize));
-                            }
                         }
                         else
                         {
@@ -104,6 +109,7 @@ namespace DataExtractor
                         dbReader.BaseStream.Position = 0;
                     }
                 }
+
 
                 if (header.IsValidDbcFile || header.IsValidDb3File)
                 {
@@ -281,19 +287,42 @@ namespace DataExtractor
                         // Read remaining bytes if needed
                         var remainingBytes = (int)(dbReader.BaseStream.Position - headerLength) % 4;
 
-                        dbReader.ReadBytes(header.IsValidDb3File ? 4 - remainingBytes : remainingBytes);
+                        if (remainingBytes > 0)
+                            dbReader.ReadBytes(header.IsValidDb3File ? 4 - remainingBytes : remainingBytes);
 
                         table.Rows.Add(row);
                     }
 
                     table.EndLoadData();
                 }
+
+                var refReader = new BinaryReader(new MemoryStream(header.ReferenceDataBlock));
+
+                if (header.ReferenceDataBlock.Length > 0)
+                {
+                    refData.Columns.Add("Id", typeof(uint));
+                    refData.Columns.Add("ReferenceId", typeof(uint));
+
+                    refData.BeginLoadData();
+
+                    while (refReader.BaseStream.Position != refReader.BaseStream.Length)
+                    {
+                        var row = refData.NewRow();
+
+                        row["Id"] = refReader.ReadUInt32();
+                        row["ReferenceId"] = refReader.ReadUInt32();
+
+                        refData.Rows.Add(row);
+                    }
+
+                    refData.EndLoadData();
+                }
             }
             catch
             {
             }
 
-            return table;
+            return Tuple.Create(table, refData);
         }
     }
 }

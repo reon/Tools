@@ -73,7 +73,7 @@ namespace DataExtractor
             Directory.CreateDirectory("./Project-WoW/Maps");
 
             var mapDBC = cascHandler.ReadFile(@"DBFilesClient\Map.dbc");
-            var mapDBData = DBReader.Read(mapDBC, typeof(MapDB));
+            var mapDBData = DBReader.Read(mapDBC, typeof(MapDB)).Item1;
 
             Parallel.For(0, mapDBData.Rows.Count, i =>
             {
@@ -334,13 +334,21 @@ namespace DataExtractor
 
                             if (hasStringProperties)
                             {
-                                localeMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
-                                localeMSSQL.Write(GenerateMSSQLData(pluralized, dbTable));
+                                localeMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable.Item1));
+                                localeMSSQL.Write(GenerateMSSQLData(pluralized, dbTable.Item1));
                             }
                             else
                             {
-                                noLocaleMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
-                                noLocaleMSSQL.Write(GenerateMSSQLData(pluralized, dbTable));
+                                noLocaleMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable.Item1));
+                                noLocaleMSSQL.Write(GenerateMSSQLData(pluralized, dbTable.Item1));
+                            }
+
+                            if (dbTable.Item2.Rows.Count > 0)
+                            {
+                                pluralized = $"{nameOnly}{nameof(Reference)}".Pluralize();
+
+                                noLocaleMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable.Item2));
+                                noLocaleMSSQL.Write(GenerateMSSQLData(pluralized, dbTable.Item2));
                             }
 
                             counter++;
@@ -395,6 +403,12 @@ namespace DataExtractor
                     case "SByte":
                     case "Byte":
                         typeName = "tinyint(3) unsigned NOT NULL";
+                        break;
+                    case "Int16":
+                        typeName = "smallint(5) NOT NULL";
+                        break;
+                    case "UInt16":
+                        typeName = "smallint(5) unsigned NOT NULL";
                         break;
                     case "Int32":
                         if (c.ColumnName == "Race" || c.ColumnName == "RaceId" || c.ColumnName == "Class" || c.ColumnName == "ClassId"

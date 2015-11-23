@@ -18,4 +18,10 @@ namespace DataExtractor
     public class UnusedShort
     {
     }
+
+    public class Reference
+    {
+        public uint Id { get; set; }
+        public uint ReferenceId { get; set; }
+    }
 }

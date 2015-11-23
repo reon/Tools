@@ -28,6 +28,5 @@ namespace DataExtractor.Structures
         public Unused Unused13;
         public Unused Unused14;
         public Unused Unused15;
-        public Unused Unused16;
     }
 }

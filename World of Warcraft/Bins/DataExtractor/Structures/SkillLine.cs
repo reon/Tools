@@ -13,6 +13,5 @@ namespace DataExtractor.Structures
         public byte CategoryID;
         public byte CanLink;
         public byte ParentSkillLineID;
-        
     }
 }
