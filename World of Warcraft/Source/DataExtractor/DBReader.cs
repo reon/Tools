@@ -56,6 +56,8 @@ namespace DataExtractor
                     StringBlockSize = dbReader.Read<uint>()
                 };
 
+                var hasDataOffsetBlock = false;
+
                 if (header.IsValidDb3File)
                 {
                     header.Hash = dbReader.Read<uint>();
@@ -70,12 +72,13 @@ namespace DataExtractor
                     var dataSize = header.RecordCount * header.RecordSize;
                     var indexDataSize = header.RecordCount * 4;
 
+                    hasDataOffsetBlock = dbReader.BaseStream.Length > dataSize + indexDataSize + header.StringBlockSize + header.ReferenceDataSize + 48;
+
                     if (header.Min != 0 && header.Max != 0)
                     {
                         var recordSizeList = new List<ushort>();
 
-                        // Use 0xFF for guessing that type of data blocks...
-                        if (header.RecordSize > 0xFF)
+                        if (hasDataOffsetBlock)
                         {
                             var dataStart = dbReader.ReadUInt32();
 
@@ -129,8 +132,7 @@ namespace DataExtractor
                         }
                         else
                         {
-                            // Use 0xFF for guessing that type of data blocks...
-                            if (header.RecordSize > 0xFF)
+                            if (hasDataOffsetBlock)
                             {
                                 for (var i = 0; i < header.RecordCount; i++)
                                 {
@@ -317,7 +319,7 @@ namespace DataExtractor
                                     break;
                                 case "String":
                                 {
-                                    if (header.RecordSize > 0xFF)
+                                    if (hasDataOffsetBlock)
                                     {
                                         row[f.Name] = dbReader.ReadCString();
                                     }
@@ -353,7 +355,7 @@ namespace DataExtractor
                             }
                         }
 
-                        if (header.RecordSize <= 0xFF)
+                        if (!hasDataOffsetBlock)
                         {
                             // Read remaining bytes if needed
                             var remainingBytes = (int) (dbReader.BaseStream.Position - headerLength) % 4;
