@@ -24,4 +24,9 @@ namespace DataExtractor
         public uint Id { get; set; }
         public uint ReferenceId { get; set; }
     }
+
+    public class AutoId
+    {
+        public uint Id;
+    }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using DataExtractor.Reader;
 
 namespace DataExtractor
@@ -17,7 +18,7 @@ namespace DataExtractor
         public uint RecordSize      { get; set; }
         public uint StringBlockSize { get; set; }
 
-        // DB3
+        // WDB3
         public uint Hash         { get; set; }
         public uint Build        { get; set; }
         public uint Unknown      { get; set; }
@@ -57,6 +58,8 @@ namespace DataExtractor
                 };
 
                 var hasDataOffsetBlock = false;
+                var hasAutoField = false;
+                var hasIndex = false;
 
                 if (header.IsValidDb3File)
                 {
@@ -111,7 +114,7 @@ namespace DataExtractor
                         else
                             header.Data = dbReader.ReadBytes((int)dataSize);
 
-                        var hasIndex = dbReader.BaseStream.Position + header.StringBlockSize + header.ReferenceDataSize < dbReader.BaseStream.Length;
+                        hasIndex = dbReader.BaseStream.Position + header.StringBlockSize + header.ReferenceDataSize < dbReader.BaseStream.Length;
 
                         header.StringData = dbReader.ReadBytes((int)header.StringBlockSize);
 
@@ -132,6 +135,8 @@ namespace DataExtractor
                         }
                         else
                         {
+                            hasAutoField = true;
+
                             if (hasDataOffsetBlock)
                             {
                                 for (var i = 0; i < header.RecordCount; i++)
@@ -164,6 +169,10 @@ namespace DataExtractor
                 if (header.IsValidDbcFile || header.IsValidDb3File)
                 {
                     var fields = type.GetFields();
+
+                    if (hasAutoField)
+                        fields = typeof(AutoId).GetFields().Concat(fields).ToArray();
+
                     var headerLength = dbReader.BaseStream.Position;
                     var lastStringOffset = 0;
                     var lastString = "";
@@ -182,7 +191,7 @@ namespace DataExtractor
                             var arr = f.GetValue(Activator.CreateInstance(type)) as Array;
 
                             for (var i = 0; i < arr.Length; i++)
-                                table.Columns.Add(f.Name + i, arr.GetValue(0).GetType());
+                                table.Columns.Add(f.Name + i, arr.GetType().GetElementType());
                         }
                         else
                             table.Columns.Add(f.Name, f.FieldType);
@@ -325,17 +334,15 @@ namespace DataExtractor
                                     }
                                     else
                                     {
-
                                         var stringOffset = dbReader.ReadUInt32();
 
                                         if (stringOffset != lastStringOffset)
                                         {
                                             var currentPos = dbReader.BaseStream.Position;
-                                            var stringStart = (header.RecordCount*header.RecordSize) + headerSize +
-                                                              stringOffset;
+                                            var stringStart = (header.RecordCount*header.RecordSize) + headerSize + stringOffset;
 
-                                            if (header.IsValidDb3File)
-                                                stringStart += (header.RecordCount*4);
+                                            if (header.IsValidDb3File && hasIndex)
+                                                stringStart += (header.RecordCount * 4);
 
                                             dbReader.BaseStream.Seek(stringStart, 0);
 
@@ -360,7 +367,7 @@ namespace DataExtractor
                             // Read remaining bytes if needed
                             var remainingBytes = (int) (dbReader.BaseStream.Position - headerLength) % 4;
 
-                            if (remainingBytes > 0)
+                            if (header.RecordSize > 4 && remainingBytes > 0)
                                 dbReader.ReadBytes(header.IsValidDb3File ? 4 - remainingBytes : remainingBytes);
                         }
                         else
