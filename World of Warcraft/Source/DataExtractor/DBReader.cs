@@ -50,16 +50,17 @@ namespace DataExtractor
 
                 var header = new DBHeader
                 {
-                    Signature = dbReader.ReadString(4),
-                    RecordCount = dbReader.Read<uint>(),
-                    FieldCount = dbReader.Read<uint>(),
-                    RecordSize = dbReader.Read<uint>(),
+                    Signature       = dbReader.ReadString(4),
+                    RecordCount     = dbReader.Read<uint>(),
+                    FieldCount      = dbReader.Read<uint>(),
+                    RecordSize      = dbReader.Read<uint>(),
                     StringBlockSize = dbReader.Read<uint>()
                 };
 
                 var hasDataOffsetBlock = false;
                 var hasAutoField = false;
                 var hasIndex = false;
+                var recordSizeList = new List<ushort>();
 
                 if (header.IsValidDb3File)
                 {
@@ -77,92 +78,87 @@ namespace DataExtractor
 
                     hasDataOffsetBlock = dbReader.BaseStream.Length > dataSize + indexDataSize + header.StringBlockSize + header.ReferenceDataSize + 48;
 
-                    if (header.Min != 0 && header.Max != 0)
+                    if (hasDataOffsetBlock)
                     {
-                        var recordSizeList = new List<ushort>();
+                        var dataStart = dbReader.ReadUInt32();
+
+                        dbReader.BaseStream.Position -= 4;
+
+                        while (header.DataBlockOffsets.Count < header.RecordCount)
+                        {
+                            var offset = dbReader.ReadUInt32();
+                            var size = dbReader.ReadUInt16();
+
+                            if (offset > 0 && !header.DataBlockOffsets.ContainsKey(offset))
+                                header.DataBlockOffsets.Add(offset, size);
+                        }
+
+                        var dataBlockWriter = new BinaryWriter(new MemoryStream());
+
+                        foreach (var dataBlockOffset in header.DataBlockOffsets)
+                        {
+                            dbReader.BaseStream.Position = dataBlockOffset.Key;
+
+                            dataBlockWriter.Write(dbReader.ReadBytes(dataBlockOffset.Value));
+
+                            recordSizeList.Add(dataBlockOffset.Value);
+                        }
+
+                        header.Data = (dataBlockWriter.BaseStream as MemoryStream).ToArray();
+
+                        dbReader.BaseStream.Position = dataStart + header.Data.Length;
+                    }
+                    else
+                        header.Data = dbReader.ReadBytes((int)dataSize);
+
+                    hasIndex = dbReader.BaseStream.Position + header.StringBlockSize + header.ReferenceDataSize < dbReader.BaseStream.Length;
+
+                    header.StringData = dbReader.ReadBytes((int)header.StringBlockSize);
+
+                    if (hasIndex)
+                        header.IndexData = dbReader.ReadBytes((int)indexDataSize);
+
+                    if (dbReader.BaseStream.Position != dbReader.BaseStream.Length)
+                        header.ReferenceDataBlock = dbReader.ReadBytes(header.ReferenceDataSize);
+
+                    var data = new BinaryWriter(new MemoryStream());
+                    var dataReader = new BinaryReader(new MemoryStream(header.Data));
+                    var indexDataReader = new BinaryReader(new MemoryStream(header.IndexData));
+
+                    if (!hasIndex)
+                    {
+                        for (var i = 0; i < header.RecordCount; i++)
+                            data.Write(dataReader.ReadBytes((int)header.RecordSize));
+                    }
+                    else
+                    {
+                        hasAutoField = true;
 
                         if (hasDataOffsetBlock)
                         {
-                            var dataStart = dbReader.ReadUInt32();
-
-                            dbReader.BaseStream.Position -= 4;
-
-                            while (dbReader.BaseStream.Position != dataStart)
+                            for (var i = 0; i < header.RecordCount; i++)
                             {
-                                var offset = dbReader.ReadUInt32();
-                                var size = dbReader.ReadUInt16();
-
-                                if (offset > 0 && !header.DataBlockOffsets.ContainsKey(offset))
-                                    header.DataBlockOffsets.Add(offset, size);
+                                data.Write(indexDataReader.ReadBytes(4));
+                                data.Write(dataReader.ReadBytes(recordSizeList[i]));
                             }
-
-                            var dataBlockWriter = new BinaryWriter(new MemoryStream());
-
-                            foreach (var dataBlockOffset in header.DataBlockOffsets)
-                            {
-                                dbReader.BaseStream.Position = dataBlockOffset.Key;
-
-                                dataBlockWriter.Write(dbReader.ReadBytes(dataBlockOffset.Value));
-
-                                recordSizeList.Add(dataBlockOffset.Value);
-                            }
-
-                            header.Data = (dataBlockWriter.BaseStream as MemoryStream).ToArray();
-
-                            dbReader.BaseStream.Position = dataStart + header.Data.Length;
                         }
                         else
-                            header.Data = dbReader.ReadBytes((int)dataSize);
-
-                        hasIndex = dbReader.BaseStream.Position + header.StringBlockSize + header.ReferenceDataSize < dbReader.BaseStream.Length;
-
-                        header.StringData = dbReader.ReadBytes((int)header.StringBlockSize);
-
-                        if (hasIndex)
-                            header.IndexData = dbReader.ReadBytes((int)indexDataSize);
-
-                        if (dbReader.BaseStream.Position != dbReader.BaseStream.Length)
-                            header.ReferenceDataBlock = dbReader.ReadBytes(header.ReferenceDataSize);
-
-                        var data = new BinaryWriter(new MemoryStream());
-                        var dataReader = new BinaryReader(new MemoryStream(header.Data));
-                        var indexDataReader = new BinaryReader(new MemoryStream(header.IndexData));
-
-                        if (!hasIndex)
                         {
                             for (var i = 0; i < header.RecordCount; i++)
+                            {
+                                data.Write(indexDataReader.ReadBytes(4));
                                 data.Write(dataReader.ReadBytes((int)header.RecordSize));
-                        }
-                        else
-                        {
-                            hasAutoField = true;
-
-                            if (hasDataOffsetBlock)
-                            {
-                                for (var i = 0; i < header.RecordCount; i++)
-                                {
-                                    data.Write(indexDataReader.ReadBytes(4));
-                                    data.Write(dataReader.ReadBytes(recordSizeList[i]));
-                                }
-                            }
-                            else
-                            {
-                                for (var i = 0; i < header.RecordCount; i++)
-                                {
-                                    data.Write(indexDataReader.ReadBytes(4));
-                                    data.Write(dataReader.ReadBytes((int)header.RecordSize));
-                                }
                             }
                         }
-
-                        data.Write(header.StringData);
-
-                        dataReader.Dispose();
-                        indexDataReader.Dispose();
-
-                        dbReader = new BinaryReader(data.BaseStream);
-                        dbReader.BaseStream.Position = 0;
                     }
+
+                    data.Write(header.StringData);
+
+                    dataReader.Dispose();
+                    indexDataReader.Dispose();
+
+                    dbReader = new BinaryReader(data.BaseStream);
+                    dbReader.BaseStream.Position = 0;
                 }
 
 
@@ -173,7 +169,6 @@ namespace DataExtractor
                     if (hasAutoField)
                         fields = typeof(AutoId).GetFields().Concat(fields).ToArray();
 
-                    var headerLength = dbReader.BaseStream.Position;
                     var lastStringOffset = 0;
                     var lastString = "";
                     var headerSize = header.IsValidDbcFile ? 20 : 0;
@@ -197,14 +192,40 @@ namespace DataExtractor
                             table.Columns.Add(f.Name, f.FieldType);
                     }
 
+                    var hasPadding = recordSizeList.Any(v => v > header.RecordSize);
+
                     for (int i = 0; i < header.RecordCount; i++)
                     {
                         var newObj = Activator.CreateInstance(type);
                         var row = table.NewRow();
 
+                        if (!hasPadding)
+                        {
+                            dbReader.BaseStream.Position = i*header.RecordSize;
+
+                            if (header.IsValidDbcFile)
+                                dbReader.BaseStream.Position += 20;
+
+                            if (hasIndex)
+                                dbReader.BaseStream.Position += i*4;
+                        }
+
+                        var lastFieldType = "";
+
                         foreach (var f in fields)
                         {
-                            switch (f.FieldType.Name)
+                            // Check for remaining bytes after 8 bit fields.
+                            if (header.IsValidDbcFile && f.FieldType.Name != "Byte" && lastFieldType == "Byte")
+                            {
+                                var padding = dbReader.BaseStream.Position % 4;
+
+                                if (padding > 0)
+                                    dbReader.BaseStream.Position +=  (4 - padding);
+                            }
+
+                            lastFieldType = f.FieldType.Name;
+
+                            switch (lastFieldType)
                             {
                                 case "Unused":
                                     dbReader.BaseStream.Position += 4;
@@ -326,9 +347,44 @@ namespace DataExtractor
                                     for (var j = 0; j < length; j++)
                                         row[f.Name + j] = dbReader.ReadUInt64();
                                     break;
+                                case "String[]":
+                                {
+                                    length = ((string[])f.GetValue(newObj)).Length;
+
+                                    for (var j = 0; j < length; j++)
+                                    {
+                                        if (hasDataOffsetBlock && header.StringBlockSize == 2)
+                                        {
+                                            row[f.Name + j] = dbReader.ReadCString();
+                                        }
+                                        else
+                                        {
+                                            var stringOffset = dbReader.ReadUInt32();
+
+                                            if (stringOffset != lastStringOffset)
+                                            {
+                                                var currentPos = dbReader.BaseStream.Position;
+                                                var stringStart = (header.RecordCount * header.RecordSize) + headerSize + stringOffset;
+
+                                                if (header.IsValidDb3File && hasIndex)
+                                                    stringStart += (header.RecordCount * 4);
+
+                                                dbReader.BaseStream.Seek(stringStart, 0);
+
+                                                row[f.Name + j] = lastString = dbReader.ReadCString();
+
+                                                dbReader.BaseStream.Seek(currentPos, 0);
+                                            }
+                                            else
+                                                row[f.Name + j] = lastString;
+                                        }
+                                    }
+
+                                    break;
+                                }
                                 case "String":
                                 {
-                                    if (hasDataOffsetBlock)
+                                    if (hasDataOffsetBlock && header.StringBlockSize == 2)
                                     {
                                         row[f.Name] = dbReader.ReadCString();
                                     }
@@ -339,7 +395,7 @@ namespace DataExtractor
                                         if (stringOffset != lastStringOffset)
                                         {
                                             var currentPos = dbReader.BaseStream.Position;
-                                            var stringStart = (header.RecordCount*header.RecordSize) + headerSize + stringOffset;
+                                            var stringStart = (header.RecordCount * header.RecordSize) + headerSize + stringOffset;
 
                                             if (header.IsValidDb3File && hasIndex)
                                                 stringStart += (header.RecordCount * 4);
@@ -362,16 +418,8 @@ namespace DataExtractor
                             }
                         }
 
-                        if (!hasDataOffsetBlock)
-                        {
-                            // Read remaining bytes if needed
-                            var remainingBytes = (int) (dbReader.BaseStream.Position - headerLength) % 4;
-
-                            if (header.RecordSize > 4 && remainingBytes > 0)
-                                dbReader.ReadBytes(header.IsValidDb3File ? 4 - remainingBytes : remainingBytes);
-                        }
-                        else
-                            // 3 taken from Item-sparse data block. Not sure if other files have the same...
+                        // I have no idea...
+                        if (hasPadding)
                             dbReader.BaseStream.Position += 3;
 
                         table.Rows.Add(row);
@@ -404,6 +452,7 @@ namespace DataExtractor
             }
             catch
             {
+                Console.WriteLine($"Error while loading {type.Name}");
             }
 
             return Tuple.Create(table, refData);
