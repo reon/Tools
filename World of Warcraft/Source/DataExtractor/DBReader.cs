@@ -39,10 +39,9 @@ namespace DataExtractor
 
     class DBReader
     {
-        public static Tuple<DataTable, DataTable> Read(MemoryStream dbStream, Type type)
+        public static DataTable Read(MemoryStream dbStream, Type type)
         {
             var table = new DataTable();
-            var refData = new DataTable();
 
             try
             {
@@ -58,7 +57,6 @@ namespace DataExtractor
                 };
 
                 var hasDataOffsetBlock = false;
-                var hasAutoField = false;
                 var hasIndex = false;
                 var recordSizeList = new List<ushort>();
 
@@ -132,8 +130,6 @@ namespace DataExtractor
                     }
                     else
                     {
-                        hasAutoField = true;
-
                         if (hasDataOffsetBlock)
                         {
                             for (var i = 0; i < header.RecordCount; i++)
@@ -166,7 +162,7 @@ namespace DataExtractor
                 {
                     var fields = type.GetFields();
 
-                    if (hasAutoField)
+                    if (hasIndex)
                         fields = typeof(AutoId).GetFields().Concat(fields).ToArray();
 
                     var lastStringOffset = 0;
@@ -192,22 +188,24 @@ namespace DataExtractor
                             table.Columns.Add(f.Name, f.FieldType);
                     }
 
-                    var hasPadding = recordSizeList.Any(v => v > header.RecordSize);
+                    table.PrimaryKey = new[] { table.Columns[0] };
 
-                    for (int i = 0; i < header.RecordCount; i++)
+                    var hasPadding = recordSizeList.Any(v => v > header.RecordSize);
+                    var recordSize = 0;
+
+                    for (var i = 0; i < header.RecordCount; i++)
                     {
                         var newObj = Activator.CreateInstance(type);
                         var row = table.NewRow();
-
+                       
                         if (!hasPadding)
                         {
-                            dbReader.BaseStream.Position = i*header.RecordSize;
+                            dbReader.BaseStream.Position = i * header.RecordSize;
 
                             if (header.IsValidDbcFile)
                                 dbReader.BaseStream.Position += 20;
-
-                            if (hasIndex)
-                                dbReader.BaseStream.Position += i*4;
+                            else if (hasIndex)
+                                dbReader.BaseStream.Position += i * 4;
                         }
 
                         var lastFieldType = "";
@@ -418,9 +416,15 @@ namespace DataExtractor
                             }
                         }
 
-                        // I have no idea...
                         if (hasPadding)
-                            dbReader.BaseStream.Position += 3;
+                        {
+                            recordSize += recordSizeList[i];
+ 
+                            if (hasIndex)
+                                recordSize += 4;
+
+                            dbReader.BaseStream.Position = recordSize;
+                        }
 
                         table.Rows.Add(row);
                     }
@@ -432,22 +436,22 @@ namespace DataExtractor
 
                 if (header.ReferenceDataBlock.Length > 0)
                 {
-                    refData.Columns.Add("Id", typeof(uint));
-                    refData.Columns.Add("ReferenceId", typeof(uint));
-
-                    refData.BeginLoadData();
-
                     while (refReader.BaseStream.Position != refReader.BaseStream.Length)
                     {
-                        var row = refData.NewRow();
+                        var id = refReader.ReadUInt32();
+                        var referenceId = refReader.ReadUInt32();
+                        var referenceRow = table.Rows.Find(referenceId);
 
-                        row["Id"] = refReader.ReadUInt32();
-                        row["ReferenceId"] = refReader.ReadUInt32();
+                        if (referenceRow != null)
+                        {
+                            var row = table.NewRow();
 
-                        refData.Rows.Add(row);
+                            row.ItemArray = referenceRow.ItemArray;
+                            row[0] = id;
+
+                            table.Rows.Add(row);
+                        }
                     }
-
-                    refData.EndLoadData();
                 }
             }
             catch
@@ -455,7 +459,7 @@ namespace DataExtractor
                 Console.WriteLine($"Error while loading {type.Name}");
             }
 
-            return Tuple.Create(table, refData);
+            return table;
         }
     }
 }

@@ -7,13 +7,12 @@ namespace DataExtractor.Structures
         public int Id;
         public string Directory;
         public int InstanceType;
-        public uint Flags;
-        public Unused Unkown;
+        public uint[] Flags = new uint[2];
         public int MapType;
         public string MapNameLang;
         public int AreaTableId;
-        public Unused MapDescription0Lang;
-        public Unused MapDescription1Lang;
+        public Unused MapDescription0Lang; // string
+        public Unused MapDescription1Lang; // string
         public Unused LoadingScreenID;
         public Unused MinimapIconScale;
         public int CorpseMapID;

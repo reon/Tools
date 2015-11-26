@@ -4,7 +4,6 @@ namespace DataExtractor.Structures
 {
     public class CharStartOutfit
     {
-        public uint Id;
         public uint[] ItemId = new uint[24];
         public uint PetDisplayId;
         public byte RaceId;

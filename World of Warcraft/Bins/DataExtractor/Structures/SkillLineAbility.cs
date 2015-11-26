@@ -4,7 +4,6 @@ namespace DataExtractor.Structures
 {
     public class SkillLineAbility
     {
-        public uint Id;
         public uint Spell;
         public int RaceMask;
         public int ClassMask;

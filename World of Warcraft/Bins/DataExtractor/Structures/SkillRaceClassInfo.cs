@@ -4,7 +4,6 @@ namespace DataExtractor.Structures
 {
     public class SkillRaceClassInfo
     {
-        public int Id;
         public int RaceMask;
         public short SkillId;
         public short ClassMask;

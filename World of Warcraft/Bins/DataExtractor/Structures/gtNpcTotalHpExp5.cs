@@ -4,7 +4,7 @@ namespace DataExtractor.Structures
 {
     public class gtNpcTotalHpExp5
     {
-        public int Index;
+        public uint Id;
         public float Data;
     }
 }
