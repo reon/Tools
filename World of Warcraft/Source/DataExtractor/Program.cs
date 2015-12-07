@@ -58,7 +58,8 @@ namespace DataExtractor
 
             Console.WriteLine("Done.");
 
-            ExtractMapData();
+            // We don't need them for now.
+            //ExtractMapData();
 
             Console.WriteLine();
             Console.WriteLine("Press any key to exit...");
