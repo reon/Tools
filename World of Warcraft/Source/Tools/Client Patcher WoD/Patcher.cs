@@ -61,6 +61,9 @@ namespace Connection_Patcher
                     {
                         for (int i = 0; i < bytes.Length; i++)
                             binary[offset + i] = bytes[i];
+
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("> Patch done at 0x{0:X}", offset);
                     }
                     catch (Exception ex)
                     {
@@ -68,31 +71,26 @@ namespace Connection_Patcher
                     }
                 }
             }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("! Wrong patch (invalid pattern?)");
+            }
         }
 
         long SearchOffset(byte[] pattern)
         {
-            var matches = 0;
+            long matches;
 
             for (long i = 0; i < binary.Length; i++)
             {
-                matches = 0;
+                if (pattern.Length > (binary.Length - i))
+                    return 0;
 
-                for (int j = 0; j < pattern.Length; j++)
+                for (matches = 0; matches < pattern.Length; matches++)
                 {
-                    if (pattern.Length > (binary.Length - i))
-                        return 0;
-
-                    if (pattern[j] == 0)
-                    {
-                        matches++;
-                        continue;
-                    }
-
-                    if (binary[i + j] != pattern[j])
+                    if ((pattern[matches] != 0) && (binary[i + matches] != pattern[matches]))
                         break;
-
-                    matches++;
                 }
 
                 if (matches == pattern.Length)
