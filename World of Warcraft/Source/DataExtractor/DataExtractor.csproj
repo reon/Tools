@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\FileList.cs" />
+    <Compile Include="Constants\FileFlags.cs" />
     <Compile Include="CustomTypes.cs" />
     <Compile Include="DBReader.cs" />
     <Compile Include="Helper.cs" />

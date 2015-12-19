@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using CASC_Lib.CASC.Constants;
 using CASC_Lib.CASC.Handlers;
 using CASC_Lib.Misc;
+using DataExtractor.Constants;
 using DataExtractor.Maps.Defines;
 using DataExtractor.Reader;
 using Microsoft.CSharp;
@@ -155,8 +156,12 @@ namespace DataExtractor
                     fileList.Add(dbc.Value.Replace(@"\\", @"\"));
             }
 
-            // not in wow bin
-            fileList.Add(@"DBFilesClient\WorldSafeLocs.dbc");
+            // add missing dbc/db2 file names.
+            FileList.ClientDBFileNames.ForEach(f =>
+            {
+                if (!fileList.Contains(f))
+                    fileList.Add(f);
+            });
 
             Console.WriteLine("Getting available locales...");
 
@@ -168,7 +173,6 @@ namespace DataExtractor
             {
                 var buildInfo = File.ReadAllText(cascHandler.BasePath + "/.build.info").Split(new[] { '|' })[21];
                 var buildInfoLocales = Regex.Matches(buildInfo, " ([A-Za-z]{4}) speech");
-
 
                 foreach (Match m in buildInfoLocales)
                 {
@@ -264,6 +268,7 @@ namespace DataExtractor
             Console.WriteLine("Generating SQL data...");
             Console.WriteLine();
 
+            var fileLock = new object();
             var generatedTables = new List<string>();
             var counter = 0;
 
@@ -333,15 +338,18 @@ namespace DataExtractor
 
                             var dbTable = DBReader.Read(dbStream, type);
 
-                            if (hasStringProperties)
+                            lock (fileLock)
                             {
-                                localeMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
-                                localeMSSQL.Write(GenerateMSSQLData(pluralized, dbTable));
-                            }
-                            else
-                            {
-                                noLocaleMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
-                                noLocaleMSSQL.Write(GenerateMSSQLData(pluralized, dbTable));
+                                if (hasStringProperties)
+                                {
+                                    localeMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
+                                    localeMSSQL.Write(GenerateMSSQLData(pluralized, dbTable));
+                                }
+                                else
+                                {
+                                    noLocaleMYSQL.Write(GenerateMYSQLData(nameOnly, pluralized, dbTable));
+                                    noLocaleMSSQL.Write(GenerateMSSQLData(pluralized, dbTable));
+                                }
                             }
 
                             counter++;

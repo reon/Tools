@@ -49,6 +49,14 @@ namespace DataExtractor.Reader
 
             return (T)ReadValue[type](br);
         }
+
+        public static Tuple<int, uint> ReadDword(this BinaryReader br)
+        {
+            var dword = br.ReadBytes(4);
+
+            return new Tuple<int, uint>(BitConverter.ToInt32(dword, 0), BitConverter.ToUInt32(dword, 0));
+        }
+
         public static sbyte[] ReadSByte(this BinaryReader br, int count)
         {
             var arr = new sbyte[count];
